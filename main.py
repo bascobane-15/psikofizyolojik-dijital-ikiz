@@ -1,77 +1,99 @@
-import { useState } from "react";
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
 
-export default function App() {
-  const [task, setTask] = useState(5);
-  const [sleep, setSleep] = useState(7);
-  const [social, setSocial] = useState(5);
-  const [light, setLight] = useState(12);
+# --- ARKA PLAN VE TEMA AYARI ---
+st.markdown("""
+    <style>
+    .stApp {
+        background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); /* Derin kutup mavisi */
+        color: white;
+    }
+    [data-testid="stSidebar"] {
+        background-color: #101820;
+    }
+    /* Metrik kutularını daha belirgin yapalım */
+    [data-testid="stMetricValue"] {
+        color: #00d4ff !important;
+    }
+    h1, h2, h3, p {
+        color: #ffffff !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-  // --- BASİT AMA BİLİMSEL MANTIK ---
-  const PSI = Math.round(
-    task * 6 +
-    (10 - sleep) * 4 +
-    (10 - social) * 3 +
-    Math.abs(light - 12) * 2
-  );
+# 1. Sayfa Ayarları
+st.set_page_config(page_title="Dijital İkiz Karar Destek Paneli", layout="wide")
 
-  const FYI = Math.round(
-    task * 5 +
-    (10 - sleep) * 5 +
-    Math.abs(light - 12) * 3
-  );
+st.title("❄️ Kutup Görevi: Psikofizyolojik Dijital İkiz")
+st.markdown("---")
 
-  const BPRS = Math.round((PSI + FYI) / 2);
+# 2. SOL PANEL
+st.sidebar.header("📥 Görev Değişkenleri")
 
-  const riskColor =
-    BPRS < 34 ? "#22c55e" : BPRS < 67 ? "#eab308" : "#ef4444";
+izolasyon = st.sidebar.slider("İzolasyon Süresi (Gün)", 0, 180, 120)
+uyku = st.sidebar.slider("Günlük Uyku Süresi (Saat)", 4.0, 9.0, 5.5)
+gorev_yogunlugu = st.sidebar.selectbox("Görev Yoğunluğu", ["Düşük", "Orta", "Yüksek"], index=2)
+sosyal_etkilesim = st.sidebar.selectbox("Sosyal Etkileşim", ["Günlük", "Sınırlı", "Çok Sınırlı"], index=2)
+isik_duzeyi = st.sidebar.selectbox("Işık Maruziyeti", ["Normal", "Düşük/Düzensiz"], index=1)
 
-  return (
-    <div style={{
-      minHeight: "100vh",
-      background: "linear-gradient(180deg, #020617, #020024)",
-      color: "white",
-      padding: "30px",
-      fontFamily: "Arial"
-    }}>
-      <h1>❄️ PolarTwin</h1>
-      <p>Dijital İkiz Psikofizyolojik Risk Simülasyonu</p>
+# 3. FİZYOLOJİK KATMAN (Artık Hepsi Göstergeli)
+st.sidebar.subheader("⌚ Sensör Verileri")
+hrv = st.sidebar.number_input("Kalp Hızı Değişkenliği (HRV)", 20, 100, 45)
+nabiz = st.sidebar.number_input("Nabız (bpm)", 50, 120, 85)
+# Oksijen saturasyonu artık + ve - ile kontrol ediliyor
+spo2 = st.sidebar.number_input("Oksijen Saturasyonu (SpO2 %)", 80, 100, 98)
 
-      {/* KONTROLLER */}
-      <div style={{ maxWidth: 500 }}>
-        <label>Görev Yoğunluğu: {task}</label>
-        <input type="range" min="0" max="10" value={task}
-          onChange={e => setTask(+e.target.value)} />
+# 4. RİSK HESAPLAMA MOTORU
+def risk_hesapla():
+    p_stres = 0
+    if izolasyon > 90: p_stres += 40
+    elif izolasyon > 30: p_stres += 20
+    if gorev_yogunlugu == "Yüksek": p_stres += 30
+    if sosyal_etkilesim == "Çok Sınırlı": p_stres += 30
+    
+    f_yuklenme = 0
+    if uyku < 6: f_yuklenme += 30
+    if is_isik := (isik_duzeyi == "Düşük/Düzensiz"): f_yuklenme += 20
+    if hrv < 50: f_yuklenme += 20 
+    if spo2 < 94: f_yuklenme += 30 
+    
+    total_risk = (p_stres + f_yuklenme) / 2
+    return min(total_risk, 100), p_stres, f_yuklenme
 
-        <label>Uyku Süresi (saat): {sleep}</label>
-        <input type="range" min="4" max="9" value={sleep}
-          onChange={e => setSleep(+e.target.value)} />
+butunlesik_skor, p_indeks, f_indeks = risk_hesapla()
 
-        <label>Sosyal Etkileşim: {social}</label>
-        <input type="range" min="0" max="10" value={social}
-          onChange={e => setSocial(+e.target.value)} />
+# 5. ANA PANEL
+c1, c2, c3, c4 = st.columns(4)
+with c1:
+    st.metric("Psikolojik Stres", f"{p_indeks}%")
+with c2:
+    st.metric("Fizyolojik Yüklenme", f"{f_indeks}%")
+with c3:
+    # Oksijen için özel renkli gösterge
+    st.metric("Oksijen (SpO2)", f"%{spo2}", delta="Normal" if spo2 >= 94 else "Düşük", delta_color="normal" if spo2 >= 94 else "inverse")
+with c4:
+    durum = "KRİTİK" if butunlesik_skor > 70 else ("RİSKLİ" if butunlesik_skor > 40 else "STABİL")
+    st.metric("Bütünleşik Risk", f"{butunlesik_skor}%", delta=durum, delta_color="inverse")
 
-        <label>Işık / Fotoperiyod (saat): {light}</label>
-        <input type="range" min="0" max="24" value={light}
-          onChange={e => setLight(+e.target.value)} />
-      </div>
+st.markdown("---")
 
-      {/* SONUÇLAR */}
-      <div style={{
-        marginTop: 30,
-        padding: 20,
-        borderRadius: 12,
-        background: "rgba(255,255,255,0.08)"
-      }}>
-        <h3>Psikolojik Stres İndeksi (PSI): {PSI}</h3>
-        <h3>Fizyolojik Yüklenme İndeksi (FYI): {FYI}</h3>
+# 6. GRAFİK
+st.subheader("📈 Görev Süreci Risk Tahmini")
+zaman_adimlari = np.arange(0, izolasyon + 10, 10)
+risk_egrisi = [ (x/izolasyon) * butunlesik_skor for x in zaman_adimlari]
 
-        <h2 style={{ color: riskColor }}>
-          BPRS: {BPRS}
-        </h2>
-        <strong style={{ color: riskColor }}>
-          {BPRS < 34 ? "DÜŞÜK RİSK" : BPRS < 67 ? "ORTA RİSK" : "YÜKSEK RİSK"}
-        </strong>
-      </div>
-    </div>
-  );
-}
+df_graph = pd.DataFrame({"Gün": zaman_adimlari, "Risk Skoru": risk_egrisi})
+fig = px.line(df_graph, x="Gün", y="Risk Skoru", template="plotly_dark", color_discrete_sequence=['#00d4ff'])
+st.plotly_chart(fig, use_container_width=True)
+
+# 7. UYARILAR
+if spo2 < 90:
+    st.error("🚨 KRİTİK: Düşük Oksijen Seviyesi! Acil müdahale protokolü (Antarktika Medevac) hazırlığı başlatılmalı.")
+elif butunlesik_skor > 70:
+    st.error("🔴 KRİTİK: Personel sağlığı tehlikede! İzolasyon etkisi maksimum seviyede.")
+elif butunlesik_skor > 40:
+    st.warning("🟡 UYARI: Fizyolojik yorgunluk saptandı. Dinlenme süresi artırılmalı.")
+else:
+    st.success("🟢 DURUM: Sistem ve personel parametreleri nominal.")
