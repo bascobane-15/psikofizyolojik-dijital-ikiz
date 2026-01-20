@@ -125,12 +125,23 @@ if sayfa_secimi == "🏠 Ana Kontrol Paneli":
         else:
             st.success("Parametreler güvenli aralıkta.")
 
-# DİĞER SAYFALAR (Eski yapıda devam eder...)
+# ==========================================
+# SAYFA 2: DERİN ANALİZ
+# ==========================================
 elif sayfa_secimi == "📊 Fizyolojik Derin Analiz":
     st.title("📊 Detaylı Sağlık Analizi")
     st.info("Bu bölümdeki grafikler sensör verilerinizle (Nabız, HRV) senkronize çalışır.")
-    # (Buraya önceki derin analiz grafiklerini ekleyebilirsin)
+    
+    # Görselleştirme örneği (Boş kalmaması için)
+    df_ana = pd.DataFrame({'Zaman': range(24), 'Nabız': np.random.normal(nabiz, 2, 24)})
+    fig_nabiz = px.area(df_ana, x="Zaman", y="Nabız", template="plotly_dark", title="24 Saatlik Nabız Trendi")
+    st.plotly_chart(fig_nabiz, use_container_width=True)
 
+# ==========================================
+# SAYFA 3: ACİL DURUM
+# ==========================================
 else:
     st.title("🚨 Acil Durum Protokolleri")
-    st.markdown("Tablo 6 ve Tablo 1 uyarınca belirlenen müdahale adımları...")
+    st.markdown("### Tablo 6 ve Tablo 1 uyarınca belirlenen müdahale adımları:")
+    st.warning("1. Risk skoru %60 üzerine çıktığında sosyal izolasyon sonlandırılmalıdır.")
+    st.warning("2. Düşük uyku süresi (<6 saat) durumunda ışık simülasyonu uygulanmalıdır.")
