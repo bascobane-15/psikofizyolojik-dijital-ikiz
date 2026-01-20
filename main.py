@@ -61,4 +61,4 @@ st.markdown("---")
 # 6. ZAMANA BAĞLI RİSK GRAFİĞİ
 st.subheader("📈 Zamana Bağlı Risk Projeksiyonu")
 zaman_adimlari = np.arange(0, izolasyon + 10, 10)
-risk_egrisi = [ (x/iz
+risk_egrisi = [ (x/izolasyon) * butunlesik_skor for x in zaman_adimlari] # Burayı kontrol et
