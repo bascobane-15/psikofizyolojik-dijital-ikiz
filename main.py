@@ -128,20 +128,26 @@ if sayfa_secimi == "🏠 Ana Kontrol Paneli":
 # ==========================================
 # SAYFA 2: DERİN ANALİZ
 # ==========================================
-elif sayfa_secimi == "📊 Fizyolojik Derin Analiz":
-    st.title("📊 Detaylı Sağlık Analizi")
-    st.info("Bu bölümdeki grafikler sensör verilerinizle (Nabız, HRV) senkronize çalışır.")
-    
-    # Görselleştirme örneği (Boş kalmaması için)
-    df_ana = pd.DataFrame({'Zaman': range(24), 'Nabız': np.random.normal(nabiz, 2, 24)})
-    fig_nabiz = px.area(df_ana, x="Zaman", y="Nabız", template="plotly_dark", title="24 Saatlik Nabız Trendi")
-    st.plotly_chart(fig_nabiz, use_container_width=True)
-
+elif sayfa == "📊 Fizyolojik Derin Analiz":
+    st.title("📊 Veri Analiz Laboratuvarı")
+    # Nabız-HRV Korelasyonu
+    data = pd.DataFrame({
+        'Zaman': range(50),
+        'Nabız Değişimi': np.random.normal(nabiz, 5, 50),
+        'HRV Trend': np.random.normal(hrv, 3, 50)
+    })
+    fig2 = px.line(data, x='Zaman', y=['Nabız Değişimi', 'HRV Trend'], 
+                   title="Kardiyovasküler Stabilite Analizi", template="plotly_dark")
+    st.plotly_chart(fig2, use_container_width=True)
 # ==========================================
 # SAYFA 3: ACİL DURUM
 # ==========================================
-else:
+elif sayfa == "🚨 Acil Durum Rehberi":
     st.title("🚨 Acil Durum Protokolleri")
-    st.markdown("### Tablo 6 ve Tablo 1 uyarınca belirlenen müdahale adımları:")
-    st.warning("1. Risk skoru %60 üzerine çıktığında sosyal izolasyon sonlandırılmalıdır.")
-    st.warning("2. Düşük uyku süresi (<6 saat) durumunda ışık simülasyonu uygulanmalıdır.")
+    st.markdown("""
+    ### 1. Fizyolojik Müdahale
+    * **SpO2 < %90:** Oksijen desteği başlatılmalıdır.
+    * **Nabız > 110:** Personel dinlenme moduna alınmalıdır.
+    ### 2. Psikolojik Destek
+    * **Risk > %70:** Sosyal etkileşim seansı ve gün ışığı simülasyonu artırılmalıdır.
+    """)
