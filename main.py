@@ -131,11 +131,6 @@ elif sayfa_secimi == "📊 Fizyolojik Derin Analiz":
     st.info("Bu bölümdeki grafikler sensör verilerinizle (Nabız, HRV) senkronize çalışır.")
     # (Buraya önceki derin analiz grafiklerini ekleyebilirsin)
 
-    elif sayfa == "Acil Durum Rehberi":
-    st.title("Acil Durum Protokolleri")
-    st.error("Kritik Eşik Uyarıları")
-    st.markdown("""
-    - **Risk > %65 (Tablo 6):** Çok yüksek risk; acil medikal müdahale ve tahliye planı gözden geçirilmelidir.
-    - **SpO2 < %92:** Hipoksi riski; ek oksijen desteği ve rakım ayarı yapılmalıdır.
-    - **HRV Düşüşü:** Kronik stres belirtisi; görev yoğunluğu %50 azaltılmalıdır.
-    """)
+else:
+    st.title("🚨 Acil Durum Protokolleri")
+    st.markdown("Tablo 6 ve Tablo 1 uyarınca belirlenen müdahale adımları...")
