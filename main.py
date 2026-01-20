@@ -3,97 +3,98 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
-# --- ARKA PLAN VE TEMA AYARI ---
+# 1. SAYFA AYARLARI (En üstte kalmalı)
+st.set_page_config(page_title="Kutup Dijital İkiz", layout="wide")
+
+# --- GELİŞMİŞ TASARIM (CSS) ---
 st.markdown("""
     <style>
-    .stApp {
-        background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); /* Derin kutup mavisi */
-        color: white;
+    .stApp { background: linear-gradient(to bottom, #0a192f, #112240); color: white; }
+    [data-testid="stSidebar"] { background-color: #020c1b !important; }
+    div[data-testid="metric-container"] {
+        background-color: rgba(0, 212, 255, 0.05);
+        border: 1px solid #00d4ff;
+        padding: 15px;
+        border-radius: 12px;
     }
-    [data-testid="stSidebar"] {
-        background-color: #101820;
-    }
-    /* Metrik kutularını daha belirgin yapalım */
-    [data-testid="stMetricValue"] {
-        color: #00d4ff !important;
-    }
-    h1, h2, h3, p {
-        color: #ffffff !important;
-    }
+    header {visibility: hidden;}
     </style>
     """, unsafe_allow_html=True)
 
-# 1. Sayfa Ayarları
-st.set_page_config(page_title="Dijital İkiz Karar Destek Paneli", layout="wide")
+# 2. SOL PANEL (MENÜ VE GİRDİLER)
+st.sidebar.title("🚀 Görev Kontrol")
+sayfa_secimi = st.sidebar.selectbox("Bölüm Seçiniz:", ["🏠 Ana Kontrol Paneli", "📊 Fizyolojik Derin Analiz", "🚨 Acil Durum Rehberi"])
 
-st.title("❄️ Kutup Görevi: Psikofizyolojik Dijital İkiz")
-st.markdown("---")
+st.sidebar.markdown("---")
+st.sidebar.subheader("📥 Canlı Parametreler")
+izolasyon = st.sidebar.slider("İzolasyon (Gün)", 0, 180, 60)
+uyku = st.sidebar.slider("Uyku (Saat)", 4.0, 10.0, 7.5)
+nabiz = st.sidebar.number_input("Nabız (bpm)", 40, 150, 72)
+spo2 = st.sidebar.number_input("Oksijen (SpO2 %)", 80, 100, 98)
+hrv = st.sidebar.number_input("HRV Skoru", 10, 100, 55)
 
-# 2. SOL PANEL
-st.sidebar.header("📥 Görev Değişkenleri")
+# --- RİSK HESAPLAMA MOTORU (Her sayfada kullanılabilir) ---
+risk_skoru = min(100, int((100 - spo2) * 3 + (90 - hrv) * 0.5 + (izolasyon / 5)))
 
-izolasyon = st.sidebar.slider("İzolasyon Süresi (Gün)", 0, 180, 120)
-uyku = st.sidebar.slider("Günlük Uyku Süresi (Saat)", 4.0, 9.0, 5.5)
-gorev_yogunlugu = st.sidebar.selectbox("Görev Yoğunluğu", ["Düşük", "Orta", "Yüksek"], index=2)
-sosyal_etkilesim = st.sidebar.selectbox("Sosyal Etkileşim", ["Günlük", "Sınırlı", "Çok Sınırlı"], index=2)
-isik_duzeyi = st.sidebar.selectbox("Işık Maruziyeti", ["Normal", "Düşük/Düzensiz"], index=1)
-
-# 3. FİZYOLOJİK KATMAN (Artık Hepsi Göstergeli)
-st.sidebar.subheader("⌚ Sensör Verileri")
-hrv = st.sidebar.number_input("Kalp Hızı Değişkenliği (HRV)", 20, 100, 45)
-nabiz = st.sidebar.number_input("Nabız (bpm)", 50, 120, 85)
-# Oksijen saturasyonu artık + ve - ile kontrol ediliyor
-spo2 = st.sidebar.number_input("Oksijen Saturasyonu (SpO2 %)", 80, 100, 98)
-
-# 4. RİSK HESAPLAMA MOTORU
-def risk_hesapla():
-    p_stres = 0
-    if izolasyon > 90: p_stres += 40
-    elif izolasyon > 30: p_stres += 20
-    if gorev_yogunlugu == "Yüksek": p_stres += 30
-    if sosyal_etkilesim == "Çok Sınırlı": p_stres += 30
+# ==========================================
+# SAYFA 1: ANA KONTROL PANELİ (SENİN EKRANIN)
+# ==========================================
+if sayfa_secimi == "🏠 Ana Kontrol Paneli":
+    st.title("❄️ Kutup Görevi: Psikofizyolojik Dijital İkiz")
+    st.markdown("---")
     
-    f_yuklenme = 0
-    if uyku < 6: f_yuklenme += 30
-    if is_isik := (isik_duzeyi == "Düşük/Düzensiz"): f_yuklenme += 20
-    if hrv < 50: f_yuklenme += 20 
-    if spo2 < 94: f_yuklenme += 30 
+    # Metrikler
+    c1, c2, c3, c4 = st.columns(4)
+    with c1: st.metric("Kalp Hızı", f"{nabiz} bpm")
+    with c2: st.metric("Oksijen", f"%{spo2}")
+    with c3: st.metric("HRV Durumu", hrv)
+    with c4: 
+        durum = "KRİTİK" if risk_skoru > 60 else "STABİL"
+        st.metric("Genel Risk", f"%{risk_skoru}", delta=durum, delta_color="inverse")
+
+    st.markdown("---")
     
-    total_risk = (p_stres + f_yuklenme) / 2
-    return min(total_risk, 100), p_stres, f_yuklenme
+    # Grafik ve Notlar
+    col_sol, col_sag = st.columns([2, 1])
+    with col_sol:
+        st.subheader("📈 Risk Projeksiyonu")
+        df_risk = pd.DataFrame({"Zaman": np.arange(10), "Risk": np.random.normal(risk_skoru, 2, 10)})
+        fig = px.area(df_risk, x="Zaman", y="Risk", template="plotly_dark", color_discrete_sequence=['#00d4ff'])
+        st.plotly_chart(fig, use_container_width=True)
+    
+    with col_sag:
+        st.subheader("📝 Görev Notları")
+        st.info(f"Gün {izolasyon}: Personel adaptasyonu devam ediyor.")
+        if risk_skoru > 50:
+            st.warning("Dikkat: Yüksek izolasyon yükü tespit edildi.")
+        else:
+            st.success("Sistem nominal seviyede.")
 
-butunlesik_skor, p_indeks, f_indeks = risk_hesapla()
+# ==========================================
+# SAYFA 2: DERİN ANALİZ
+# ==========================================
+elif sayfa_secimi == "📊 Fizyolojik Derin Analiz":
+    st.title("📊 Detaylı Sağlık Analizi")
+    st.write("Sensör verilerinin detaylı korelasyon grafikleri.")
+    
+    # Örnek bir dağılım grafiği
+    df_ana = pd.DataFrame({
+        'Zaman': range(24),
+        'Nabız': np.random.normal(nabiz, 5, 24),
+        'Stres': np.random.uniform(20, 80, 24)
+    })
+    fig_corr = px.scatter(df_ana, x="Nabız", y="Stres", size="Stres", color="Stres", template="plotly_dark")
+    st.plotly_chart(fig_corr, use_container_width=True)
 
-# 5. ANA PANEL
-c1, c2, c3, c4 = st.columns(4)
-with c1:
-    st.metric("Psikolojik Stres", f"{p_indeks}%")
-with c2:
-    st.metric("Fizyolojik Yüklenme", f"{f_indeks}%")
-with c3:
-    # Oksijen için özel renkli gösterge
-    st.metric("Oksijen (SpO2)", f"%{spo2}", delta="Normal" if spo2 >= 94 else "Düşük", delta_color="normal" if spo2 >= 94 else "inverse")
-with c4:
-    durum = "KRİTİK" if butunlesik_skor > 70 else ("RİSKLİ" if butunlesik_skor > 40 else "STABİL")
-    st.metric("Bütünleşik Risk", f"{butunlesik_skor}%", delta=durum, delta_color="inverse")
-
-st.markdown("---")
-
-# 6. GRAFİK
-st.subheader("📈 Görev Süreci Risk Tahmini")
-zaman_adimlari = np.arange(0, izolasyon + 10, 10)
-risk_egrisi = [ (x/izolasyon) * butunlesik_skor for x in zaman_adimlari]
-
-df_graph = pd.DataFrame({"Gün": zaman_adimlari, "Risk Skoru": risk_egrisi})
-fig = px.line(df_graph, x="Gün", y="Risk Skoru", template="plotly_dark", color_discrete_sequence=['#00d4ff'])
-st.plotly_chart(fig, use_container_width=True)
-
-# 7. UYARILAR
-if spo2 < 90:
-    st.error("🚨 KRİTİK: Düşük Oksijen Seviyesi! Acil müdahale protokolü (Antarktika Medevac) hazırlığı başlatılmalı.")
-elif butunlesik_skor > 70:
-    st.error("🔴 KRİTİK: Personel sağlığı tehlikede! İzolasyon etkisi maksimum seviyede.")
-elif butunlesik_skor > 40:
-    st.warning("🟡 UYARI: Fizyolojik yorgunluk saptandı. Dinlenme süresi artırılmalı.")
+# ==========================================
+# SAYFA 3: ACİL DURUM REHBERİ
+# ==========================================
 else:
-    st.success("🟢 DURUM: Sistem ve personel parametreleri nominal.")
+    st.title("🚨 Acil Durum Protokolleri")
+    st.error("Kritik eşik aşıldığında uygulanacak adımlar:")
+    st.markdown("""
+    1. **Oksijen %90 altı:** Derhal istasyon içi destek ünitesine bağlanın.
+    2. **Nabız 120+ (Dinlenme):** Medikal sorumluya haber verin.
+    3. **Psikolojik Kırılma:** 'Dark Sky' protokolünü başlatın ve dış dünya ile görüntülü temas kurun.
+    """)
+    st.image("https://images.unsplash.com/photo-1517030330234-94c4fa948ebc?auto=format&fit=crop&q=80&w=1000", caption="Antarktika İstasyon Güvenliği")
