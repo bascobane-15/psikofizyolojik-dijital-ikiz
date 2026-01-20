@@ -6,27 +6,28 @@ import plotly.express as px
 # 1. SAYFA AYARLARI
 st.set_page_config(page_title="Kutup Dijital İkiz v2", layout="wide")
 
-# --- SADECE SOL YAZILARI KOYU YAPAN CSS ---
+# --- KESİN ÇÖZÜM CSS: SOL TARAF BEYAZ/SİYAH, SAĞ TARAF LACİVERT/BEYAZ ---
 st.markdown("""
     <style>
-    /* Ana Arka Plan Degradesi */
-    .stApp { background: linear-gradient(to bottom, #0a192f, #112240); color: white; }
+    /* Ana Ekran Arka Planı */
+    .stApp { background-color: #0a192f; color: white; }
     
-    /* SOL PANEL (SIDEBAR) ÖZEL AYARLARI */
+    /* SOL PANEL (SIDEBAR) TASARIMI */
     [data-testid="stSidebar"] {
-        background-color: #f0f2f6 !important; /* Sol tarafı hafif gri/açık yapıyoruz ki siyah yazı görünsün */
+        background-color: #FFFFFF !important; /* Arka plan bembeyaz */
+        border-right: 1px solid #dee2e6;
     }
 
-    /* SOLDAKİ TÜM YAZILARI ZORLA SİYAH YAPAR */
-    [data-testid="stSidebar"] .stMarkdown p, 
+    /* SOLDAKİ TÜM METİNLER: Kesinlikle Siyah ve Kalın */
+    [data-testid="stSidebar"] p, 
+    [data-testid="stSidebar"] span, 
     [data-testid="stSidebar"] label, 
-    [data-testid="stSidebar"] span,
     [data-testid="stSidebar"] div {
-        color: #000000 !important; /* SİYAH YAZI */
-        font-weight: 700 !important; /* KALIN YAZI */
+        color: #000000 !important; 
+        font-weight: 700 !important;
     }
-
-    /* Sağ taraftaki metrik kutuları ve ana başlıklar beyaz kalsın */
+    
+    /* Metrik Kutuları (Sağ Taraf) */
     div[data-testid="metric-container"] {
         background-color: rgba(0, 212, 255, 0.1);
         border: 1px solid #00d4ff;
@@ -38,35 +39,18 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 2. SOL PANEL (MENÜ VE GİRDİLER)
+# 2. SOL PANEL (DEĞİŞKENLER) - Her sayfada görünmesi için if dışında tutuyoruz
 st.sidebar.title("🚀 Görev Kontrol")
 sayfa_secimi = st.sidebar.selectbox("Bölüm Seçiniz:", ["🏠 Ana Kontrol Paneli", "📊 Fizyolojik Derin Analiz", "🚨 Acil Durum Rehberi"])
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("📥 Canlı Parametreler")
 
-# Parametrelerin (Aynen Korundu)
 izolasyon = st.sidebar.slider("İzolasyon Süresi (Gün)", 0, 120, 60)
-
-gorev_yogunlugu = st.sidebar.select_slider(
-    "Görev Yoğunluğu",
-    options=["Düşük", "Orta", "Yüksek"],
-    value="Orta"
-)
-
-sosyal_etkilesim = st.sidebar.select_slider(
-    "Sosyal Etkileşim",
-    options=["Çok Sınırlı", "Sınırlı", "Günlük"],
-    value="Sınırlı"
-)
-
-isik_maruziyeti = st.sidebar.select_slider(
-    "Işık Maruziyeti / Risk Seviyesi",
-    options=["Düşük", "Orta", "Yüksek", "Çok Yüksek"],
-    value="Orta"
-)
-
-uyku = st.sidebar.slider("Uyku Süresi (Saat)", 4.0, 9.0, 7.0)
+gorev_yogunlugu = st.sidebar.select_slider("Görev Yoğunluğu", options=["Düşük", "Orta", "Yüksek"], value="Orta")
+sosyal_etkilesim = st.sidebar.select_slider("Sosyal Etkileşim", options=["Çok Sınırlı", "Sınırlı", "Günlük"], value="Sınırlı")
+isik_maruziyeti = st.sidebar.select_slider("Işık Maruziyeti", options=["Düşük", "Orta", "Yüksek", "Çok Yüksek"], value="Orta")
+uyku = st.sidebar.slider("Uyku Süresi (Saat)", 4.0, 9.0, 7.5)
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("⌚ Sensör Verileri")
@@ -74,33 +58,37 @@ nabiz = st.sidebar.number_input("Nabız (bpm)", 40, 150, 72)
 spo2 = st.sidebar.number_input("Oksijen (SpO2 %)", 80, 100, 98)
 hrv = st.sidebar.number_input("HRV Skoru", 10, 100, 55)
 
-# --- RİSK HESAPLAMA MOTORU (Aynen Korundu) ---
+# --- RİSK HESAPLAMA MOTORU ---
 def akademik_risk_hesapla():
     p_skor = 0
     if izolasyon > 90: p_skor += 35
     elif izolasyon >= 30: p_skor += 20
     if gorev_yogunlugu == "Yüksek": p_skor += 25
     if sosyal_etkilesim == "Çok Sınırlı": p_skor += 25
+    
     isik_risk_map = {"Düşük": 25, "Orta": 35, "Yüksek": 55, "Çok Yüksek": 65}
     isik_riski = isik_risk_map[isik_maruziyeti]
+    
     f_skor = 0
     if uyku < 6: f_skor += 30
     if spo2 < 94: f_skor += 30
     if hrv < 45: f_skor += 20
+    
     toplam_risk = (p_skor + f_skor + isik_riski) / 3
     return min(100, int(toplam_risk)), p_skor, f_skor
 
 risk_skoru, p_indeks, f_indeks = akademik_risk_hesapla()
 
 # ==========================================
-# SAYFA İÇERİKLERİ
+# SAYFALARIN İÇERİĞİ
 # ==========================================
+
 if sayfa_secimi == "🏠 Ana Kontrol Paneli":
     st.title("❄️ POLAR TWIN")
     st.caption("Psikofizyolojik Dijital İkiz Karar Destek Paneli")
     st.markdown("---")
     
-    # Metrikler (Sağ Taraf - Beyaz Yazı)
+    # Metrikler
     c1, c2, c3, c4 = st.columns(4)
     with c1: st.metric("Psikolojik Yük", f"%{p_indeks}")
     with c2: st.metric("Fizyolojik Yük", f"%{f_indeks}")
@@ -114,24 +102,47 @@ if sayfa_secimi == "🏠 Ana Kontrol Paneli":
     col_graph, col_info = st.columns([2, 1])
     with col_graph:
         st.subheader("📊 Görev Süreci Risk Projeksiyonu")
+        # Grafik Verisi (Tablo 6 Senkronize)
         gunler = [30, 60, 90, 120]
-        riskler = [25, 35, 55, 65] 
+        riskler = [25, 35, 55, 65]
         df_tablo6 = pd.DataFrame({"Gün": gunler, "Risk Skoru": riskler})
         fig = px.area(df_tablo6, x="Gün", y="Risk Skoru", markers=True, template="plotly_dark")
+        fig.update_layout(yaxis_range=[0, 100])
         st.plotly_chart(fig, use_container_width=True)
     
     with col_info:
         st.subheader("📋 Durum Özeti")
-        st.info("Takım: POLAR TWIN")
-        if risk_skoru > 50:
-            st.error("Müdahale Gerekli")
-        else:
-            st.success("Sistem Stabil")
+        st.success(f"**Takım:** POLAR TWIN")
+        st.write(f"**İzolasyon Günü:** {izolasyon}")
+        st.write(f"**Işık Durumu:** {isik_maruziyeti}")
+        st.write(f"**Uyku Düzeni:** {uyku} Saat")
 
 elif sayfa_secimi == "📊 Fizyolojik Derin Analiz":
-    st.title("📊 Detaylı Analiz")
-    st.write("Bu bölümdeki veriler sensörlerinizle senkronize çalışmaktadır.")
+    st.title("📊 Detaylı Sağlık Analizi")
+    st.markdown("---")
+    st.info("Bu bölümdeki veriler sensörlerinizden gelen Nabız ve HRV değerlerini analiz eder.")
+    
+    col_a, col_b = st.columns(2)
+    with col_a:
+        # Nabız Trendi
+        df_nabiz = pd.DataFrame({'Zaman': range(24), 'Nabız': np.random.normal(nabiz, 3, 24)})
+        fig_n = px.line(df_nabiz, x='Zaman', y='Nabız', title="24 Saatlik Nabız Takibi", template="plotly_dark")
+        st.plotly_chart(fig_n, use_container_width=True)
+    with col_b:
+        # HRV Analizi
+        df_hrv = pd.DataFrame({'Zaman': range(24), 'HRV': np.random.normal(hrv, 5, 24)})
+        fig_h = px.bar(df_hrv, x='Zaman', y='HRV', title="HRV Stabilite Değerleri", template="plotly_dark", color_discrete_sequence=['#00d4ff'])
+        st.plotly_chart(fig_h, use_container_width=True)
 
-else:
-    st.title("🚨 Acil Durum Rehberi")
-    st.write("Tablo 6 ve Tablo 1 uyarınca belirlenen müdahale adımları...")
+elif sayfa_secimi == "🚨 Acil Durum Rehberi":
+    st.title("🚨 Acil Durum Protokolleri")
+    st.markdown("---")
+    st.error("Kritik Seviye Müdahaleleri (Tablo 1 & 6)")
+    
+    with st.expander("🔴 Psikolojik Müdahale (%70+ Risk)"):
+        st.write("- Personel derhal sosyal etkileşime yönlendirilmelidir.")
+        st.write("- Uyku düzeni 8 saate sabitlenmelidir.")
+    
+    with st.expander("🟡 Fizyolojik Müdahale (Düşük SpO2/HRV)"):
+        st.write("- Oksijen satürasyonu %94 altındaysa ortam havalandırması kontrol edilmelidir.")
+        st.write("- HRV skoru 40 altındaysa fiziksel aktivite kısıtlanmalıdır.")
