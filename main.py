@@ -14,7 +14,7 @@ st.markdown("""
     
     /* SOL PANEL (SIDEBAR) TASARIMI */
     [data-testid="stSidebar"] {
-        background-color: #FFFFFF !important; /* Arka plan bembeyaz */
+        background-color: #FFFFFF !important; /* Arka plan mavi*/
         border-right: 1px solid #dee2e6;
     }
 
