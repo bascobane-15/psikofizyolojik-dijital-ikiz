@@ -106,24 +106,32 @@ def akademik_risk_hesapla():
     return min(100, int(toplam_risk)), p_skor, f_skor
 
 risk_skoru, p_indeks, f_indeks = akademik_risk_hesapla()
-# --- DETAYLI SENARYO UYARI SİSTEMİ ---
+# --- GELİŞMİŞ SENARYO VE KARAR DESTEK MODÜLÜ ---
 st.sidebar.markdown("---")
 
+# ÖNCELİKLİ DURUM 1: Hipoksik Stres (Oksijen)
 if spo2 < 94:
-    # Senaryo 1: Oksijen odaklı (Tablo 6)
-    st.sidebar.error(f"🚨 **HİPOKSİK RİSK:** Oksijen %{spo2}! Kandaki oksijen düşüşü fiziksel bitkinliği hızlandırıyor.")
+    st.sidebar.error(f"🚨 **HİPOKSİK STRES:** Oksijen %{spo2}! Kandaki düşük oksijen, fiziksel bitkinliği ve bilişsel hataları hızlandırır [Tablo 6].")
+    st.sidebar.caption("💡 **Öneri:** Derin nefes egzersizi yapın ve kabin basıncını kontrol edin.")
 
+# DURUM 2: Otonom Sinir Sistemi Yorgunluğu (HRV)
 elif hrv < 45:
-    # Senaryo 2: HRV odaklı (Tablo 7)
-    st.sidebar.info("🧠 **ZİHİNSEL YORGUNLUK:** OSS dengesi bozulmuş. Dinlenemediğiniz gözlemleniyor (HRV Düşük).")
+    st.sidebar.info("🧠 **OTONOM YORGUNLUK:** HRV değeriniz (%45) kritik eşiğin altında! Vücudunuzun strese karşı toleransı düşmüş durumda [Tablo 7].")
+    st.sidebar.caption("💡 **Öneri:** Kısa süreli dinlenme (power-nap) veya meditasyon önerilir.")
 
-elif risk_skoru > 60:
-    # Senaryo 3: Birleşik Risk odaklı (Tablo 7)
-    st.sidebar.warning(f"⚠️ **KÜMÜLATİF YÜK:** Risk %{risk_skoru}! İzolasyon ve görev yükü kritik sınırı aştı.")
+# DURUM 3: Sirkadiyen Ritim Bozulması (Nabız & Uyku)
+elif nabiz > 80 and uyku < 5:
+    st.sidebar.warning("⚠️ **SİRKADİYEN RİSK:** Yüksek nabız ve yetersiz uyku kombinasyonu tespit edildi! Fizyolojik yüklenme (FYİ) artıyor [Tablo 6].")
+    st.sidebar.caption("💡 **Öneri:** Acil olmayan görevleri erteleyin ve uyku periyoduna geçin.")
 
+# DURUM 4: Yüksek Kümülatif Risk (BPRS)
+elif risk_skoru > 65:
+    st.sidebar.warning(f"📈 **KÜMÜLATİF YÜK:** Bütünleşik risk skoru %{risk_skoru}! Psikolojik ve çevresel faktörler güvenli sınırı aştı [Tablo 7].")
+    st.sidebar.caption("💡 **Öneri:** İzolasyon etkisini azaltmak için sosyal etkileşim kurun.")
+
+# DURUM 5: İdeal Durum
 else:
-    # Durum 4: Stabil
-    st.sidebar.success("✅ **SİSTEM STABİL:** Polar Twin verileri güvenli aralıkta.")
+    st.sidebar.success("✅ **SİSTEM STABİL:** Fizyolojik ve psikolojik parametreler nominal değerlerde. Görev icrası için uygunsunuz.")
 # ==========================================
 # SAYFALARIN İÇERİĞİ
 # ==========================================
