@@ -12,11 +12,11 @@ st.markdown("""
     /* Ana Ekran Arka Planı */
     .stApp { background-color: #0a192f; color: white; }
     
-   /* SOL PANEL (SIDEBAR) TASARIMI */
-[data-testid="stSidebar"] {
-    background-color: #F0F8FF !important; /* Burayı AliceBlue (Buz Mavisi) yaptık */
-    border-right: 1px solid #dee2e6;
-}
+    /* SOL PANEL (SIDEBAR) TASARIMI */
+    [data-testid="stSidebar"] {
+        background-color: #F0F8FF !important; /* AliceBlue (Buz Mavisi) */
+        border-right: 1px solid #dee2e6;
+    }
 
     /* SOLDAKİ TÜM METİNLER: Kesinlikle Siyah ve Kalın */
     [data-testid="stSidebar"] p, 
@@ -33,6 +33,14 @@ st.markdown("""
         border: 1px solid #00d4ff;
         padding: 15px;
         border-radius: 12px;
+    }
+
+    /* BURAYI YENİ EKLEDİK: GÖSTERGE RAKAMLARI VE BAŞLIKLARI */
+    [data-testid="stMetricValue"] {
+        color: #A0D6E8 !important; /* Rakamlar buz mavisi */
+    }
+    [data-testid="stMetricLabel"] {
+        color: #E1FFFF !important; /* Başlıklar açık buz mavisi */
     }
     
     header {visibility: hidden;}
