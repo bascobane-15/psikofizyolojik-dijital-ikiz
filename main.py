@@ -128,19 +128,35 @@ if sayfa_secimi == "🏠 Ana Kontrol Paneli":
 elif sayfa_secimi == "📊 Fizyolojik Derin Analiz":
     st.title("📊 Detaylı Sağlık Analizi")
     st.markdown("---")
-    st.info("Bu bölümdeki veriler sensörlerinizden gelen Nabız ve HRV değerlerini analiz eder.")
+    st.info("Bu bölümdeki veriler sensörlerinizden gelen Nabız, HRV ve Oksijen değerlerini analiz eder.")
     
+    # --- ÜST SIRA: NABIZ VE HRV ---
     col_a, col_b = st.columns(2)
+    
     with col_a:
         # Nabız Trendi
         df_nabiz = pd.DataFrame({'Zaman': range(24), 'Nabız': np.random.normal(nabiz, 3, 24)})
-        fig_n = px.line(df_nabiz, x='Zaman', y='Nabız', title="24 Saatlik Nabız Takibi", template="plotly_dark")
+        fig_n = px.line(df_nabiz, x='Zaman', y='Nabız', title="💓 24 Saatlik Nabız Takibi", template="plotly_dark")
+        fig_n.update_traces(line_color='#4A90E2') # Nabız rengini mavi yapalım
         st.plotly_chart(fig_n, use_container_width=True)
+
     with col_b:
         # HRV Analizi
         df_hrv = pd.DataFrame({'Zaman': range(24), 'HRV': np.random.normal(hrv, 5, 24)})
-        fig_h = px.bar(df_hrv, x='Zaman', y='HRV', title="HRV Stabilite Değerleri", template="plotly_dark", color_discrete_sequence=['#00d4ff'])
+        fig_h = px.bar(df_hrv, x='Zaman', y='HRV', title="📊 HRV Stabilite Değerleri", template="plotly_dark", color_discrete_sequence=['#00d4ff'])
         st.plotly_chart(fig_h, use_container_width=True)
+
+    # --- ALT SIRA: GENİŞ OKSİJEN GRAFİĞİ ---
+    st.markdown("---")
+    # Oksijen (SpO2) Analizi
+    df_oksijen = pd.DataFrame({'Zaman': range(24), 'Oksijen': np.random.normal(oksijen, 1, 24)})
+    fig_o = px.area(df_oksijen, x='Zaman', y='Oksijen', title="🫁 Oksijen (SpO2 %) Seviyesi - Geniş İzleme", template="plotly_dark")
+    fig_o.update_traces(fillcolor='rgba(160, 214, 232, 0.4)', line_color='#A0D6E8') # Buz mavisi ve şeffaf dolgu
+    
+    # Oksijen grafiği genellikle 90-100 arası olduğu için Y eksenini sabitleyelim ki daha net görünsün
+    fig_o.update_yaxes(range=[85, 105]) 
+    
+    st.plotly_chart(fig_o, use_container_width=True)
 
 elif sayfa_secimi == "🚨 Acil Durum Rehberi":
     st.title("🚨 Acil Durum Protokolleri")
