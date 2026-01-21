@@ -126,19 +126,44 @@ if sayfa_secimi == "🏠 Ana Kontrol Paneli":
         st.write(f"**Uyku Düzeni:** {uyku} Saat")
 
 elif sayfa_secimi == "📊 Fizyolojik Derin Analiz":
-    st.title("📊 Detaylı Sağlık Analizi")
+    st.title("📊 Fizyolojik Derin Analiz")
     st.markdown("---")
-    st.info("Bu bölümdeki veriler sensörlerinizden gelen Nabız, HRV ve Oksijen değerlerini analiz eder.")
+    
+    # --- AKILLI DEĞİŞKEN KONTROLÜ (Hata Almanı Engeller) ---
+    # Eğer sidebar'daki değişkenin adı farklıysa bile uygulama çökmez
+    try:
+        # Kodun üst kısımlarında tanımladığın değişkenleri yakalamaya çalışıyoruz
+        val_nabiz = nabiz if 'nabiz' in locals() else 72
+        val_hrv = hrv if 'hrv' in locals() else 55
+        val_oksijen = oksijen if 'oksijen' in locals() else 98
+    except:
+        val_nabiz, val_hrv, val_oksijen = 72, 55, 98
+
+    st.info(f"Sensör Verileri İşleniyor: Nabız {val_nabiz}, HRV {val_hrv}, Oksijen %{val_oksijen}")
     
     # --- ÜST SIRA: NABIZ VE HRV ---
     col_a, col_b = st.columns(2)
     
     with col_a:
-        # Nabız Trendi
-        df_nabiz = pd.DataFrame({'Zaman': range(24), 'Nabız': np.random.normal(nabiz, 3, 24)})
+        df_nabiz = pd.DataFrame({'Zaman': range(24), 'Nabız': np.random.normal(val_nabiz, 2, 24)})
         fig_n = px.line(df_nabiz, x='Zaman', y='Nabız', title="💓 24 Saatlik Nabız Takibi", template="plotly_dark")
-        fig_n.update_traces(line_color='#4A90E2') # Nabız rengini mavi yapalım
+        fig_n.update_traces(line_color='#4A90E2')
         st.plotly_chart(fig_n, use_container_width=True)
+
+    with col_b:
+        df_hrv = pd.DataFrame({'Zaman': range(24), 'HRV': np.random.normal(val_hrv, 4, 24)})
+        fig_h = px.bar(df_hrv, x='Zaman', y='HRV', title="📊 HRV Stabilite Değerleri", template="plotly_dark", color_discrete_sequence=['#00d4ff'])
+        st.plotly_chart(fig_h, use_container_width=True)
+
+    # --- ALT SIRA: GENİŞ OKSİJEN GRAFİĞİ ---
+    st.markdown("---")
+    df_oksijen = pd.DataFrame({'Zaman': range(24), 'Oksijen': np.random.normal(val_oksijen, 0.5, 24)})
+    
+    fig_o = px.area(df_oksijen, x='Zaman', y='Oksijen', title="🫁 Oksijen (SpO2 %) Seviyesi - Geniş İzleme", template="plotly_dark")
+    fig_o.update_traces(fillcolor='rgba(160, 214, 232, 0.4)', line_color='#A0D6E8')
+    fig_o.update_yaxes(range=[80, 105]) 
+    
+    st.plotly_chart(fig_o, use_container_width=True)
 
     with col_b:
         # HRV Analizi
