@@ -106,26 +106,24 @@ def akademik_risk_hesapla():
     return min(100, int(toplam_risk)), p_skor, f_skor
 
 risk_skoru, p_indeks, f_indeks = akademik_risk_hesapla()
-# --- AKILLI UYARI SİSTEMİ (Tablo 6 ve 7'ye Göre) ---
+# --- AKILLI UYARI SİSTEMİ (Sol Panele Taşınmış Hali) ---
 st.markdown("---")
-uyari_container = st.container()
 
-with uyari_container:
-    # Durum 1: Oksijen Kritik (Tablo 6: Hipoksik Stres)
-    if spo2 < 94:
-        st.error(f"🚨 **KRİTİK UYARI:** Oksijen seviyesi (%{spo2}) eşik değerin altında! Hipoksik stres riski tespit edildi. Derin nefes egzersizi yapın.")
+# Durum 1: Oksijen Kritik
+if spo2 < 94:
+    st.sidebar.error(f"🚨 **KRİTİK UYARI:** Oksijen %{spo2}!")
     
-    # Durum 2: Bütünleşik Risk Yüksek (Tablo 7: BPRS İvmelenmesi)
-    elif risk_skoru > 60:
-        st.warning(f"⚠️ **YÜKSEK RİSK:** Bütünleşik risk skoru (%{risk_skoru}) güvenli sınırı aştı. Fizyolojik dinlenme periyoduna geçilmesi önerilir.")
+# Durum 2: Bütünleşik Risk Yüksek
+elif risk_skoru > 60:
+    st.sidebar.warning(f"⚠️ **YÜKSEK RİSK:** Skor %{risk_skoru}!")
     
-    # Durum 3: HRV Düşük (Tablo 7: Otonom Sinir Sistemi Yorgunluğu)
-    elif hrv < 45:
-        st.info("ℹ️ **BİLGİ:** HRV değerlerinizde düşüş gözlemlendi. Otonom sinir sistemi yorgunluğu belirtisi olabilir, uyku kalitenizi kontrol edin.")
+# Durum 3: HRV Düşük
+elif hrv < 45:
+    st.sidebar.info("ℹ️ **BİLGİ:** HRV düşük.")
     
-    # Durum 4: Her şey yolunda
-    else:
-        st.success("✅ **SİSTEM STABİL:** Tüm fizyolojik verileriniz akademik referans aralıklarında seyrediyor.")
+# Durum 4: Her şey yolunda
+else:
+    st.sidebar.success("✅ **SİSTEM STABİL**")
 # ==========================================
 # SAYFALARIN İÇERİĞİ
 # ==========================================
