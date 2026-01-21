@@ -211,34 +211,60 @@ elif sayfa_secimi == "🚨 Acil Durum Rehberi":
     st.title("🚨 Acil Durum Protokolleri")
     st.markdown("---")
     
-    # --- 1. YENİ EKLEME: CANLI DURUM ANALİZİ ---
-    # Bu kısım o anki risk skoruna göre kullanıcıya özel mesaj verir.
+    # --- 1. CANLI DURUM ANALİZİ (Okunabilirliği artırılmış) ---
     if risk_skoru > 60:
-        st.warning(f"⚠️ **DİKKAT:** Şu anki Bütünleşik Risk Skorunuz (%{risk_skoru}) yüksek seviyededir. Aşağıdaki protokolleri dikkatle uygulayın.")
+        st.warning(f"### ⚠️ DİKKAT: Risk Skorunuz %{risk_skoru}")
+        st.write("Şu anki verileriniz yüksek risk grubundadır. Lütfen aşağıdaki adımları sırasıyla takip edin.")
     else:
-        st.success("✅ Şu anki risk seviyeniz güvenli aralıktadır. Önleyici protokolleri inceleyebilirsiniz.")
+        st.success("### ✅ Durum Stabil")
+        st.write("Risk seviyeniz güvenli aralıkta. Aşağıdaki protokoller önleyici bilgi amaçlıdır.")
 
-    st.error("Kritik Seviye Müdahaleleri (Tablo 1 & 6)")
+    # Parantez içindeki (Tablo 1 & 6) ibaresi kaldırıldı
+    st.error("Kritik Seviye Müdahaleleri")
 
-    # --- 2. MEVCUT YAPIN (Aynen Korundu) ---
+    # --- 2. MEVCUT GENİŞLETİLEBİLİR PANELLER ---
     with st.expander("🔴 Psikolojik Müdahale (%70+ Risk)"):
-        st.write("- Personel derhal sosyal etkileşime yönlendirilmelidir.")
-        st.write("- Uyku düzeni 8 saatlenmelidir.")
+        st.markdown("#### **Uygulanacak Adımlar:**")
+        st.write("- **Sosyal Etkileşim:** Personel derhal sosyal etkileşime yönlendirilmelidir.")
+        st.write("- **Uyku Standardı:** Uyku düzeni 8 saate sabitlenmelidir.")
 
     with st.expander("🟡 Fizyolojik Müdahale (Düşük SpO2/HRV)"):
-        st.write("- Oksijen satürasyonu %94 altındaysa ortam havalandırması kontrol edilmelidir.")
-        st.write("- HRV skoru 40 altındaysa fiziksel aktivite kısıtlanmalıdır.")
+        st.markdown("#### **Uygulanacak Adımlar:**")
+        st.write("- **Havalandırma:** Oksijen satürasyonu %94 altındaysa ortam havalandırması kontrol edilmelidir.")
+        st.write("- **Aktivite Kısıtlaması:** HRV skoru 40 altındaysa fiziksel aktivite derhal kısıtlanmalıdır.")
 
-    # --- 3. YENİ EKLEME: TABLO 6 & 7 ÖZET MATRİSİ ---
-    # Bu tablo, rehberin hangi bilimsel temele dayandığını gösterir.
-    st.markdown("### 📊 Müdahale Eşik Değerleri")
-    rehber_data = {
-        "Durum": ["Hipoksi (Oksijen Azlığı)", "OSS Yorgunluğu", "Zihinsel Tükenmişlik"],
-        "Gösterge": ["SpO2 < %94", "HRV < 45 ms", "Risk > %70"],
-        "Acil Aksiyon": ["Oksijen Desteği / Havalandırma", "Aktif Dinlenme", "Sosyal İzolasyonun Kırılması"]
-    }
-    st.table(rehber_data)
+    # --- 3. MÜDAHALE EŞİK DEĞERLERİ (Tablo yerine büyük yazılı kartlar) ---
+    st.markdown("---")
+    st.subheader("📊 Müdahale Eşik Değerleri")
+    
+    col_x, col_y, col_z = st.columns(3)
+    
+    with col_x:
+        st.markdown("""
+        **🫁 HİPOKSİ** **Eşik:** SpO2 < %94  
+        **Aksiyon:** Oksijen Desteği
+        """)
+        
+    with col_y:
+        st.markdown("""
+        **🧠 OSS YORGUNLUĞU** **Eşik:** HRV < 45 ms  
+        **Aksiyon:** Aktif Dinlenme
+        """)
+        
+    with col_z:
+        st.markdown("""
+        **📉 KRİTİK RİSK** **Eşik:** Risk > %70  
+        **Aksiyon:** Görev Durdurma
+        """)
 
+    # --- 4. AKADEMİK REFERANS BİLGİ KUTUSU ---
+    st.markdown("---")
+    with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar"):
+        st.markdown(f"""
+        **Metodoloji:** Bu protokoller, **Tablo 6**'daki fizyolojik katsayılar ve **Tablo 7**'deki dinamik bütünleşik risk hesaplamalarına (BPRS) göre anlık olarak filtrelenmektedir. 
+        
+        **Önemli Not:** Oksijen seviyesindeki her düşüş, tüm riskleri **1.15 katsayısı** ile şiddetlendirir.
+        """)
     # --- 4. MEVCUT BİLGİ KUTUSU (Geliştirildi) ---
     st.markdown("---")
     with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar Hakkında"):
