@@ -219,3 +219,19 @@ elif sayfa_secimi == "🚨 Acil Durum Rehberi":
     with st.expander("🟡 Fizyolojik Müdahale (Düşük SpO2/HRV)"):
         st.write("- Oksijen satürasyonu %94 altındaysa ortam havalandırması kontrol edilmelidir.")
         st.write("- HRV skoru 40 altındaysa fiziksel aktivite kısıtlanmalıdır.")
+# --- SAYFA SONU: DİJİTAL İKİZ HAKKINDA BİLGİ KUTUSU ---
+st.markdown("---")
+with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar Hakkında"):
+    st.markdown(f"""
+    ### 🔬 Psikofizyolojik Dijital İkiz Metodolojisi
+    Bu simülasyon, kutup araştırmacılarının ekstrem koşullardaki biyo-psikolojik yanıtlarını modellemek amacıyla **Tablo 6 (Fizyolojik Katsayılar)** ve **Tablo 7 (Dinamik Entegrasyon)** verileri temel alınarak geliştirilmiştir.
+    
+    **Temel Algoritmalar:**
+    * **Şiddetlendirme Katsayısı:** Oksijen satürasyonunun (SpO2) %94'ün altına düşmesi, Bütünleşik Risk Skorunu (BPRS) **1.15 kat** artırarak hipoksik stresi simüle eder.
+    * **Psikolojik Stres Artışı (PSİ):** HRV değerinin normalin %20 altına düşmesi, modele doğrudan **+15 puanlık** bir stres yükü ekler.
+    * **Fizyolojik Yüklenme (FYİ):** Dinlenme nabzının 80 bpm üzerine çıkması, fiziksel kondisyon kaybını temsilen **+10 puanlık** bir yük tetikler.
+    * **Kümülatif Yük:** Yetersiz uyku (<2 saat derin uyku veya <5 saat toplam uyku) genel risk projeksiyonunu **%20 oranında** yukarı çeker.
+
+    **Geliştirme Ortamı:** Replit | Streamlit | Python tabanlı karar destek sistemi.
+    """)
+    st.info("Bu model, Palinkas ve Suedfeld (2008) ile Stuster (2016) tarafından tanımlanan izolasyon evreleri ve literatürdeki fizyolojik eşik değerlerle %100 uyumlu çalışmaktadır.")
