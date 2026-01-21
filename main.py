@@ -68,24 +68,44 @@ hrv = st.sidebar.number_input("HRV Skoru", 10, 100, 55)
 
 # --- RİSK HESAPLAMA MOTORU ---
 def akademik_risk_hesapla():
+    # --- 1. PSİKOLOJİK STRES İNDEKSİ (PSİ) HESABI ---
     p_skor = 0
     if izolasyon > 90: p_skor += 35
     elif izolasyon >= 30: p_skor += 20
     if gorev_yogunlugu == "Yüksek": p_skor += 25
     if sosyal_etkilesim == "Çok Sınırlı": p_skor += 25
     
-    isik_risk_map = {"Düşük": 25, "Orta": 35, "Yüksek": 55, "Çok Yüksek": 65}
-    isik_riski = isik_risk_map[isik_maruziyeti]
-    
+    # [TABLO 6 KURALI]: HRV normalin %20 altına düşerse (Örn: <45) PSİ'ye +15 puan ekle
+    if hrv < 45: 
+        p_skor += 15
+
+    # --- 2. FİZYOLOJİK YÜKLENME İNDEKSİ (FYİ) HESABI ---
     f_skor = 0
     if uyku < 6: f_skor += 30
-    if spo2 < 94: f_skor += 30
-    if hrv < 45: f_skor += 20
     
+    # [TABLO 6 KURALI]: Dinlenme Nabzı > 80 bpm ise FYİ'ye +10 puan ekle
+    if nabiz > 80:
+        f_skor += 10
+    
+    # --- 3. IŞIK RİSKİ ---
+    isik_risk_map = {"Düşük": 25, "Orta": 35, "Yüksek": 55, "Çok Yüksek": 65}
+    isik_riski = isik_risk_map[isik_maruziyeti]
+
+    # --- 4. BÜTÜNLEŞİK RİSK SKORU (BPRS) VE ŞİDDETLENDİRME ---
     toplam_risk = (p_skor + f_skor + isik_riski) / 3
+    
+    # [TABLO 6 KURALI]: Oksijen %94'ün altına inerse BPRS skoru 1.15 ile çarpılır
+    if spo2 < 94:
+        toplam_risk = toplam_risk * 1.15
+        
+    # [TABLO 6 KURALI]: Uyku kalitesi (derin uyku) düşükse genel risk %20 artar
+    # Not: Eğer derin uyku verisi yoksa genel uyku üzerinden simüle ediyoruz
+    if uyku < 5:
+        toplam_risk *= 1.20
+
     return min(100, int(toplam_risk)), p_skor, f_skor
 
-risk_skoru, p_indeks, f_indeks = akademik_risk_hesapla()
+risk_skoru, p_skor, f_skor = akademik_risk_hesapla()
 
 # ==========================================
 # SAYFALARIN İÇERİĞİ
