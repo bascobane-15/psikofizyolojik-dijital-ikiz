@@ -106,24 +106,24 @@ def akademik_risk_hesapla():
     return min(100, int(toplam_risk)), p_skor, f_skor
 
 risk_skoru, p_indeks, f_indeks = akademik_risk_hesapla()
-# --- SOL PANEL EN ALTA UYARI SİSTEMİ ---
-st.sidebar.markdown("---") # Bir ayırıcı çizgi çekelim
+# --- DETAYLI SENARYO UYARI SİSTEMİ ---
+st.sidebar.markdown("---")
 
-# Durum 1: Oksijen Kritik (Tablo 6)
 if spo2 < 94:
-    st.sidebar.error(f"🚨 **KRİTİK UYARI:** Oksijen %{spo2}! Hipoksik stres riski.")
+    # Senaryo 1: Oksijen odaklı (Tablo 6)
+    st.sidebar.error(f"🚨 **HİPOKSİK RİSK:** Oksijen %{spo2}! Kandaki oksijen düşüşü fiziksel bitkinliği hızlandırıyor.")
 
-# Durum 2: Bütünleşik Risk Yüksek (Tablo 7)
-elif risk_skoru > 60:
-    st.sidebar.warning(f"⚠️ **YÜKSEK RİSK:** Skor %{risk_skoru}! Dinlenme önerilir.")
-
-# Durum 3: HRV Düşük (Tablo 7)
 elif hrv < 45:
-    st.sidebar.info("ℹ️ **BİLGİ:** HRV düşük. OSS yorgunluğu olabilir.")
+    # Senaryo 2: HRV odaklı (Tablo 7)
+    st.sidebar.info("🧠 **ZİHİNSEL YORGUNLUK:** OSS dengesi bozulmuş. Dinlenemediğiniz gözlemleniyor (HRV Düşük).")
 
-# Durum 4: Her şey yolunda
+elif risk_skoru > 60:
+    # Senaryo 3: Birleşik Risk odaklı (Tablo 7)
+    st.sidebar.warning(f"⚠️ **KÜMÜLATİF YÜK:** Risk %{risk_skoru}! İzolasyon ve görev yükü kritik sınırı aştı.")
+
 else:
-    st.sidebar.success("✅ **SİSTEM STABİL**")
+    # Durum 4: Stabil
+    st.sidebar.success("✅ **SİSTEM STABİL:** Polar Twin verileri güvenli aralıkta.")
 # ==========================================
 # SAYFALARIN İÇERİĞİ
 # ==========================================
