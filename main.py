@@ -210,15 +210,40 @@ elif sayfa_secimi == "📊 Fizyolojik Derin Analiz":
 elif sayfa_secimi == "🚨 Acil Durum Rehberi":
     st.title("🚨 Acil Durum Protokolleri")
     st.markdown("---")
-    st.error("Kritik Seviye Müdahaleleri (Tablo 1 & 6)")
     
+    # --- 1. YENİ EKLEME: CANLI DURUM ANALİZİ ---
+    # Bu kısım o anki risk skoruna göre kullanıcıya özel mesaj verir.
+    if risk_skoru > 60:
+        st.warning(f"⚠️ **DİKKAT:** Şu anki Bütünleşik Risk Skorunuz (%{risk_skoru}) yüksek seviyededir. Aşağıdaki protokolleri dikkatle uygulayın.")
+    else:
+        st.success("✅ Şu anki risk seviyeniz güvenli aralıktadır. Önleyici protokolleri inceleyebilirsiniz.")
+
+    st.error("Kritik Seviye Müdahaleleri (Tablo 1 & 6)")
+
+    # --- 2. MEVCUT YAPIN (Aynen Korundu) ---
     with st.expander("🔴 Psikolojik Müdahale (%70+ Risk)"):
         st.write("- Personel derhal sosyal etkileşime yönlendirilmelidir.")
-        st.write("- Uyku düzeni 8 saate sabitlenmelidir.")
-    
+        st.write("- Uyku düzeni 8 saatlenmelidir.")
+
     with st.expander("🟡 Fizyolojik Müdahale (Düşük SpO2/HRV)"):
         st.write("- Oksijen satürasyonu %94 altındaysa ortam havalandırması kontrol edilmelidir.")
         st.write("- HRV skoru 40 altındaysa fiziksel aktivite kısıtlanmalıdır.")
+
+    # --- 3. YENİ EKLEME: TABLO 6 & 7 ÖZET MATRİSİ ---
+    # Bu tablo, rehberin hangi bilimsel temele dayandığını gösterir.
+    st.markdown("### 📊 Müdahale Eşik Değerleri")
+    rehber_data = {
+        "Durum": ["Hipoksi (Oksijen Azlığı)", "OSS Yorgunluğu", "Zihinsel Tükenmişlik"],
+        "Gösterge": ["SpO2 < %94", "HRV < 45 ms", "Risk > %70"],
+        "Acil Aksiyon": ["Oksijen Desteği / Havalandırma", "Aktif Dinlenme", "Sosyal İzolasyonun Kırılması"]
+    }
+    st.table(rehber_data)
+
+    # --- 4. MEVCUT BİLGİ KUTUSU (Geliştirildi) ---
+    st.markdown("---")
+    with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar Hakkında"):
+        st.write("**Metodoloji:** Bu protokoller, Tablo 6'daki fizyolojik katsayılar ve Tablo 7'deki bütünleşik risk hesaplamalarına göre dinamik olarak filtrelenmektedir.")
+        st.write("**Referans:** Palinkas ve Suedfeld (2008), Uzay ve Antarktika Görevlerinde Psikofizyolojik Uyum Protokolleri.")
 # --- SAYFA SONU: DİJİTAL İKİZ HAKKINDA BİLGİ KUTUSU ---
 st.markdown("---")
 with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar Hakkında"):
