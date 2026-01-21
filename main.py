@@ -152,7 +152,7 @@ elif sayfa_secimi == "📊 Fizyolojik Derin Analiz":
         fig_h = px.bar(df_h, x='Zaman', y='HRV', title="📊 HRV Stabilite Değerleri", template="plotly_dark", color_discrete_sequence=['#00d4ff'])
         st.plotly_chart(fig_h, use_container_width=True)
 
-    # --- ALT SIRA: TEK VE GENİŞ GRAFİK ---
+    # --- ALT SIRA: TEK GRAFİK ---
     st.markdown("---")
     # 3. GRAFİK: OKSİJEN (Alan Grafik)
     df_o = pd.DataFrame({'Zaman': range(24), 'Oksijen': np.random.normal(current_oksijen, 0.5, 24)})
