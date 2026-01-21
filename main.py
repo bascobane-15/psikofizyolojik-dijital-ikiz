@@ -105,7 +105,7 @@ def akademik_risk_hesapla():
 
     return min(100, int(toplam_risk)), p_skor, f_skor
 
-risk_skoru, p_skor, f_skor = akademik_risk_hesapla()
+risk_skoru, p_indeks, f_indeks = akademik_risk_hesapla()
 
 # ==========================================
 # SAYFALARIN İÇERİĞİ
