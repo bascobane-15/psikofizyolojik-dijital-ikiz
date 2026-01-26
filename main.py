@@ -53,8 +53,8 @@ sayfa_secimi = st.sidebar.selectbox(
     "Bölüm Seçiniz:",
     ["🏠 Ana Kontrol Paneli",
      "📊 Fizyolojik Derin Analiz",
-    "🧩 Dijital İkiz Veri Akışı"
-    "🚨 Acil Durum Rehberi", ]
+    "🧩 Dijital İkiz Veri Akışı",
+     "🚨 Acil Durum Rehberi" ]
 )
 
 st.sidebar.markdown("---")
