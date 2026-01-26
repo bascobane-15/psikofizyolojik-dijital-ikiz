@@ -267,5 +267,18 @@ elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
 
     st.markdown("## 🚧 BU SAYFA AKTİF VE ÇALIŞIYOR")
     st.success("Eğer bu yazıyı görüyorsan, 4. sayfa doğru çalışıyor.")
+    st.markdown("---")
+    st.subheader("📥 Gerçek Sensör Verisi (Bu Sayfaya Özel)")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        twin_hrv = st.number_input("HRV (ms) – Dijital İkiz", 20, 120, 55)
+
+    with col2:
+        twin_spo2 = st.number_input("SpO₂ (%) – Dijital İkiz", 85, 100, 98)
+
+    with col3:
+        twin_nabiz = st.number_input("Nabız (bpm) – Dijital İkiz", 40, 150, 72)
 
 
