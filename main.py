@@ -261,12 +261,10 @@ elif sayfa_secimi == "🚨 Acil Durum Rehberi":
 
         **Not:** Bu yapı klinik tanı değil, erken risk farkındalığı amaçlıdır.
         """)
-elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
+if sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
+    st.title("📡 DİJİTAL İKİZ – TEST SAYFASI")
+    st.success("EĞER BUNU GÖRÜYORSAN, SAYFA ÇALIŞIYOR")
 
-    st.title("📡 Dijital İkiz – Gerçek Veri Entegrasyonu")
-
-    st.markdown("## 🚧 BU SAYFA AKTİF VE ÇALIŞIYOR")
-    st.success("Eğer bu yazıyı görüyorsan, 4. sayfa doğru çalışıyor.")
     st.markdown("---")
     st.subheader("📥 Gerçek Sensör Verisi (Bu Sayfaya Özel)")
 
