@@ -265,20 +265,7 @@ st.write("SEÇİLEN SAYFA:", sayfa_secimi)
 
 SEÇİLEN SAYFA: 📡 Gerçek Veri Entegrasyonu
 
-    st.title("📡 DİJİTAL İKİZ – TEST SAYFASI")
-    st.success("EĞER BUNU GÖRÜYORSAN, SAYFA ÇALIŞIYOR")
 
-    st.subheader("📥 Gerçek Sensör Verisi (Bu Sayfaya Özel)")
 
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        twin_hrv = st.number_input("HRV (ms) – Dijital İkiz", 20, 120, 55)
-
-    with col2:
-        twin_spo2 = st.number_input("SpO₂ (%) – Dijital İkiz", 85, 100, 98)
-
-    with col3:
-        twin_nabiz = st.number_input("Nabız (bpm) – Dijital İkiz", 40, 150, 72)
-
+   
 
