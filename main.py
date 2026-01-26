@@ -49,13 +49,7 @@ st.markdown("""
 
 # 2. SOL PANEL (DEĞİŞKENLER) - Her sayfada görünmesi için if dışında tutuyoruz
 st.sidebar.title("🚀 Görev Kontrol")
-sayfa_secimi = st.sidebar.selectbox(
-    "Bölüm Seçiniz:",
-    ["🏠 Ana Kontrol Paneli",
-     "📊 Fizyolojik Derin Analiz",
-     "🚨 Acil Durum Rehberi",
-     "🧩 Dijital İkiz Veri Akışı"]
-)
+sayfa_secimi = st.sidebar.selectbox("Bölüm Seçiniz:", ["🏠 Ana Kontrol Paneli", "📊 Fizyolojik Derin Analiz", "🚨 Acil Durum Rehberi"])
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("📥 Canlı Parametreler")
@@ -213,16 +207,6 @@ elif sayfa_secimi == "📊 Fizyolojik Derin Analiz":
     
     st.plotly_chart(fig_o, use_container_width=True)
 
-elif page == "Dijital İkiz Gerçek Veri Entegrasyonu":
-
-    st.header("🔗 Dijital İkiz – Gerçek Veri Entegrasyon Akışı")
-
-    st.markdown("""
-    Bu sayfa, dijital ikiz modelinin harici sensör verileriyle
-    kalibre edilebilir bir sisteme dönüştürülmesini amaçlayan
-    kavramsal ve deneysel veri akışını göstermektedir.
-    """)
-
 elif sayfa_secimi == "🚨 Acil Durum Rehberi":
     st.title("🚨 Acil Durum Protokolleri")
     st.markdown("---")
@@ -302,4 +286,3 @@ with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar Hakkında"
     **Geliştirme Ortamı:** Replit | Streamlit | Python tabanlı karar destek sistemi.
     """)
     st.info("Bu model, Palinkas ve Suedfeld (2008) ile Stuster (2016) tarafından tanımlanan izolasyon evreleri ve literatürdeki fizyolojik eşik değerlerle %100 uyumlu çalışmaktadır.")
-
