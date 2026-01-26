@@ -305,6 +305,17 @@ elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
         "harici veri akışları (API / CSV / IoT) ile kalibre edilebilir "
         "şekilde tasarlanmıştır."
     )
+# --- SYSTEM MEMORY (SAFE STEP 1) ---
+if "system_history" not in st.session_state:
+    st.session_state.system_history = []
+
+# --- DATA INPUT GATEWAY (SAFE STEP 2) ---
+st.markdown("### 📥 Harici Veri Girişi (Opsiyonel)")
+
+uploaded_file = st.file_uploader(
+    "Sensör verisi yükle (CSV)", 
+    type=["csv"]
+)
 
 
 
