@@ -217,10 +217,11 @@ elif sayfa_secimi == "📊 Fizyolojik Derin Analiz":
     st.plotly_chart(fig_o, use_container_width=True)
 
 elif sayfa_secimi == "🚨 Acil Durum Rehberi":
+
     st.title("🚨 Acil Durum Protokolleri")
     st.markdown("---")
-    
-    # --- 1. CANLI DURUM ANALİZİ (Okunabilirliği artırılmış) ---
+
+    # --- 1. CANLI DURUM ANALİZİ ---
     if risk_skoru > 60:
         st.warning(f"### ⚠️ DİKKAT: Risk Skorunuz %{risk_skoru}")
         st.write("Şu anki verileriniz yüksek risk grubundadır. Lütfen aşağıdaki adımları sırasıyla takip edin.")
@@ -228,73 +229,82 @@ elif sayfa_secimi == "🚨 Acil Durum Rehberi":
         st.success("### ✅ Durum Stabil")
         st.write("Risk seviyeniz güvenli aralıkta. Aşağıdaki protokoller önleyici bilgi amaçlıdır.")
 
-    # Parantez içindeki (Tablo 1 & 6) ibaresi kaldırıldı
     st.error("Kritik Seviye Müdahaleleri")
 
-    # --- 2. MEVCUT GENİŞLETİLEBİLİR PANELLER ---
+    # --- 2. GENİŞLETİLEBİLİR PANELLER ---
     with st.expander("🔴 Psikolojik Müdahale (%70+ Risk)"):
-        st.markdown("#### **Uygulanacak Adımlar:**")
         st.write("- **Sosyal Etkileşim:** Personel derhal sosyal etkileşime yönlendirilmelidir.")
         st.write("- **Uyku Standardı:** Uyku düzeni 8 saate sabitlenmelidir.")
 
     with st.expander("🟡 Fizyolojik Müdahale (Düşük SpO2/HRV)"):
-        st.markdown("#### **Uygulanacak Adımlar:**")
-        st.write("- **Havalandırma:** Oksijen satürasyonu %94 altındaysa ortam havalandırması kontrol edilmelidir.")
-        st.write("- **Aktivite Kısıtlaması:** HRV skoru 40 altındaysa fiziksel aktivite derhal kısıtlanmalıdır.")
+        st.write("- **Havalandırma:** SpO2 %94 altındaysa ortam havalandırması kontrol edilmelidir.")
+        st.write("- **Aktivite Kısıtlaması:** HRV < 40 ise fiziksel aktivite kısıtlanmalıdır.")
 
-    # --- 3. MÜDAHALE EŞİK DEĞERLERİ (Tablo yerine büyük yazılı kartlar) ---
+    # --- 3. EŞİK DEĞERLERİ ---
     st.markdown("---")
     st.subheader("📊 Müdahale Eşik Değerleri")
-    
-    col_x, col_y, col_z = st.columns(3)
-    
-    with col_x:
-        st.markdown("""
-        **🫁 HİPOKSİ** **Eşik:** SpO2 < %94  
-        **Aksiyon:** Oksijen Desteği
-        """)
-        
-    with col_y:
-        st.markdown("""
-        **🧠 OSS YORGUNLUĞU** **Eşik:** HRV < 45 ms  
-        **Aksiyon:** Aktif Dinlenme
-        """)
-        
-    with col_z:
-        st.markdown("""
-        **📉 KRİTİK RİSK** **Eşik:** Risk > %70  
-        **Aksiyon:** Görev Durdurma
-        """)
 
-    # --- 4. AKADEMİK REFERANS BİLGİ KUTUSU ---
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown("**🫁 SpO2 < %94**  \nOksijen Desteği")
+
+    with col2:
+        st.markdown("**🧠 HRV < 45 ms**  \nAktif Dinlenme")
+
+    with col3:
+        st.markdown("**📉 Risk > %70**  \nGörev Durdurma")
+
+    # --- 4. AKADEMİK BİLGİ KUTUSU ---
     st.markdown("---")
     with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar"):
-        st.markdown(f"""
-        **Metodoloji:** Bu protokoller, **Tablo 6**'daki fizyolojik katsayılar ve **Tablo 7**'deki dinamik bütünleşik risk hesaplamalarına (BPRS) göre anlık olarak filtrelenmektedir. 
-        
-        **Önemli Not:** Oksijen seviyesindeki her düşüş, tüm riskleri **1.15 katsayısı** ile şiddetlendirir.
-        """)
-    # --- 4. MEVCUT BİLGİ KUTUSU (Geliştirildi) ---
-    st.markdown("---")
-    with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar Hakkında"):
-        st.write("**Metodoloji:** Bu protokoller, Tablo 6'daki fizyolojik katsayılar ve Tablo 7'deki bütünleşik risk hesaplamalarına göre dinamik olarak filtrelenmektedir.")
-        st.write("**Referans:** Palinkas ve Suedfeld (2008), Uzay ve Antarktika Görevlerinde Psikofizyolojik Uyum Protokolleri.")
-# --- SAYFA SONU: DİJİTAL İKİZ HAKKINDA BİLGİ KUTUSU ---
-st.markdown("---")
-with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar Hakkında"):
-    st.markdown(f"""
-    ### 🔬 Psikofizyolojik Dijital İkiz Metodolojisi
-    Bu simülasyon, kutup araştırmacılarının ekstrem koşullardaki biyo-psikolojik yanıtlarını modellemek amacıyla **Tablo 6 (Fizyolojik Katsayılar)** ve **Tablo 7 (Dinamik Entegrasyon)** verileri temel alınarak geliştirilmiştir.
-    
-    **Temel Algoritmalar:**
-    * **Şiddetlendirme Katsayısı:** Oksijen satürasyonunun (SpO2) %94'ün altına düşmesi, Bütünleşik Risk Skorunu (BPRS) **1.15 kat** artırarak hipoksik stresi simüle eder.
-    * **Psikolojik Stres Artışı (PSİ):** HRV değerinin normalin %20 altına düşmesi, modele doğrudan **+15 puanlık** bir stres yükü ekler.
-    * **Fizyolojik Yüklenme (FYİ):** Dinlenme nabzının 80 bpm üzerine çıkması, fiziksel kondisyon kaybını temsilen **+10 puanlık** bir yük tetikler.
-    * **Kümülatif Yük:** Yetersiz uyku (<2 saat derin uyku veya <5 saat toplam uyku) genel risk projeksiyonunu **%20 oranında** yukarı çeker.
+        st.markdown("""
+        **Metodoloji:** Bu protokoller, literatüre dayalı fizyolojik katsayılar
+        ve dinamik bütünleşik risk hesaplamaları (BPRS) temel alınarak üretilmektedir.
 
-    **Geliştirme Ortamı:** Replit | Streamlit | Python tabanlı karar destek sistemi.
-    """)
-    st.info("Bu model, Palinkas ve Suedfeld (2008) ile Stuster (2016) tarafından tanımlanan izolasyon evreleri ve literatürdeki fizyolojik eşik değerlerle %100 uyumlu çalışmaktadır.")
+        **Not:** Bu yapı klinik tanı değil, erken risk farkındalığı amaçlıdır.
+        """)
+elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
+    st.title("📡 Gerçek Veri Entegrasyonu")
+    st.markdown("---")
+
+    st.info(
+        "Bu sayfa, dijital ikiz modelinin ileride gerçek sensör verileri "
+        "ile besleneceği entegrasyon katmanının ön gösterimidir. "
+        "Şu anda veriler simülasyon amaçlıdır."
+    )
+
+    st.markdown("### 📥 Simüle Edilmiş Sensör Girdileri")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric(
+            label="🧠 HRV",
+            value="55 ms",
+            help="Kalp hızı değişkenliği – otonom sinir sistemi yükünü temsil eder."
+        )
+
+    with col2:
+        st.metric(
+            label="🫁 SpO₂",
+            value="%98",
+            help="Kandaki oksijen doygunluğu."
+        )
+
+    with col3:
+        st.metric(
+            label="💓 Nabız",
+            value="72 bpm",
+            help="Dinlenme kalp atım hızı."
+        )
+
+    st.markdown("---")
+    st.caption(
+        "Not: Bu mimari, ilerleyen aşamalarda giyilebilir sensörler veya "
+        "harici veri akışları (API / CSV / IoT) ile kalibre edilebilir "
+        "şekilde tasarlanmıştır."
+    )
 
 
 
