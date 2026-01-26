@@ -265,7 +265,6 @@ if sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
     st.title("📡 DİJİTAL İKİZ – TEST SAYFASI")
     st.success("EĞER BUNU GÖRÜYORSAN, SAYFA ÇALIŞIYOR")
 
-    st.markdown("---")
     st.subheader("📥 Gerçek Sensör Verisi (Bu Sayfaya Özel)")
 
     col1, col2, col3 = st.columns(3)
