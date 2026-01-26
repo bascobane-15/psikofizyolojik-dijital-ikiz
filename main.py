@@ -49,13 +49,16 @@ st.markdown("""
 
 # 2. SOL PANEL (DEĞİŞKENLER) - Her sayfada görünmesi için if dışında tutuyoruz
 st.sidebar.title("🚀 Görev Kontrol")
-sayfa_secimi = st.sidebar.selectbox(
-    "Bölüm Seçiniz:",
-    ["🏠 Ana Kontrol Paneli",
-     "📊 Fizyolojik Derin Analiz",
-     "🚨 Acil Durum Rehberi",
-     "🧩 Dijital İkiz Veri Akışı"]
+sayfa_secimi = st.sidebar.radio(
+    "Sayfa Seçiniz",
+    [
+        "📊 Genel Durum",
+        "🧠 Psikolojik Analiz",
+        "🚨 Acil Durum Rehberi",
+        "📡 Gerçek Veri Entegrasyonu"
+    ]
 )
+
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("📥 Canlı Parametreler")
@@ -263,8 +266,12 @@ elif sayfa_secimi == "🚨 Acil Durum Rehberi":
         """)
 elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
 
+    st.error("BU SATIRI GÖRÜYORSAN SAYFA ÇALIŞIYOR")
+
     st.title("📡 Gerçek Veri Entegrasyonu")
-    st.markdown("---")
+    ...
+
+     st.markdown("---")
 
     # === 1. SAYFA ÇALIŞIYOR MU TESTİ ===
     st.success("✅ Sayfa başarıyla yüklendi. (Bu mesajı görüyorsan sorun yok)")
