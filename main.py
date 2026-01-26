@@ -293,3 +293,10 @@ with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar Hakkında"
     """)
     st.info("Bu model, Palinkas ve Suedfeld (2008) ile Stuster (2016) tarafından tanımlanan izolasyon evreleri ve literatürdeki fizyolojik eşik değerlerle %100 uyumlu çalışmaktadır.")
 
+sayfa_secimi = st.sidebar.selectbox(
+    "Bölüm Seçiniz:",
+    ["🏠 Ana Kontrol Paneli",
+     "📊 Fizyolojik Derin Analiz",
+     "🚨 Acil Durum Rehberi",
+     "🧩 Dijital İkiz Veri Akışı"]
+)
