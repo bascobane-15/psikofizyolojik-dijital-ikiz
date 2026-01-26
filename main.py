@@ -261,7 +261,10 @@ elif sayfa_secimi == "🚨 Acil Durum Rehberi":
 
         **Not:** Bu yapı klinik tanı değil, erken risk farkındalığı amaçlıdır.
         """)
-if sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
+st.write("SEÇİLEN SAYFA:", sayfa_secimi)
+
+SEÇİLEN SAYFA: 📡 Gerçek Veri Entegrasyonu
+
     st.title("📡 DİJİTAL İKİZ – TEST SAYFASI")
     st.success("EĞER BUNU GÖRÜYORSAN, SAYFA ÇALIŞIYOR")
 
