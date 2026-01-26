@@ -301,6 +301,52 @@ elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
         nabiz = st.number_input(
             "❤️ Nabız (bpm)",
             min_value=40,
+            max_value=140,
+            value=72
+        )
+
+    st.markdown("---")
+
+    # === 3. VERİLER OKUNDU MU ===
+    st.subheader("📥 Alınan Veriler")
+
+    st.write(f"HRV: {hrv} ms")
+    st.write(f"SpO₂: %{spo2}")
+    st.write(f"Nabız: {nabiz} bpm")
+
+    st.markdown("---")
+
+    # === 4. BASİT DURUM ANALİZİ ===
+    st.subheader("📊 Ön Değerlendirme")
+
+    if spo2 < 94:
+        st.error("⚠️ Düşük oksijen satürasyonu algılandı")
+    else:
+        st.success("✅ Oksijen seviyesi normal")
+
+    if hrv < 45:
+        st.warning("⚠️ Düşük HRV – fizyolojik stres olası")
+    else:
+        st.success("✅ HRV normal aralıkta")
+
+    if nabiz > 90:
+        st.warning("⚠️ Yüksek nabız")
+    else:
+        st.success("✅ Nabız normal")
+
+    st.markdown("---")
+
+    # === 5. AKADEMİK BAĞLAM ===
+    with st.expander("ℹ️ Dijital İkiz ve Gerçek Veri Açıklaması"):
+        st.markdown("""
+        Bu sayfa, giyilebilir sensörlerden veya IoT cihazlarından alınabilecek
+        **gerçek zamanlı fizyolojik verilerin**, dijital ikiz modeline
+        nasıl entegre edileceğini göstermek amacıyla oluşturulmuştur.
+
+        Şu an kullanılan veriler **manuel girişlidir** ve simülasyon amaçlıdır.
+        """)
+
+    st.info("Bir sonraki adımda: BLE / CSV / API üzerinden gerçek sensör verisi bağlanabilir.")
 
 
 
