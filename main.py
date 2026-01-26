@@ -275,7 +275,7 @@ elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
 
     st.info("Bu aşamada sistem simülasyon modundadır. Gerçek veri alınmamaktadır.")
 
-       st.subheader("📥 Sensör Verisi Girişi (Simülasyon)")
+           st.subheader("📥 Sensör Verisi Girişi (Simülasyon)")
 
     col1, col2, col3 = st.columns(3)
 
