@@ -212,6 +212,101 @@ elif sayfa_secimi == "📊 Fizyolojik Derin Analiz":
     fig_o.update_yaxes(range=[85, 105]) # Oksijen değerini daha net görmek için ölçekleme
     
     st.plotly_chart(fig_o, use_container_width=True)
+elif sayfa_secimi == "🧩 Dijital İkiz Veri Akışı":
+    st.title("🧩 Dijital İkiz – Gerçek Veri Entegrasyon Akışı")
+    st.caption("Simülasyon tabanlı modelden, veriyle kalibre edilebilir dijital ikiz mimarisine geçiş")
+    st.markdown("---")
+
+    # === ÜST: AKIŞIN SÖZEL TEMSİLİ ===
+    st.subheader("📥 Girdi Katmanı (Input Layer)")
+    st.markdown("""
+    - İzolasyon Süresi **I(t)**
+    - Görev Yoğunluğu **G(t)**
+    - Uyku Süresi **U(t)**
+    - Sosyal Etkileşim **S(t)**
+    - Giyilebilir Sensörler *(opsiyonel)*: **HRV**, **SpO₂**
+    """)
+
+    st.markdown("⬇️")
+
+    st.subheader("⚙️ Ön İşleme ve Normalizasyon")
+    st.markdown("""
+    - Tüm değişkenler **0–1 aralığında normalize edilir**
+    - Zaman adımlarına bölünür *(t → t+1)*
+    - Gürültü ve eksik veri kavramsal olarak ele alınır
+    """)
+
+    st.markdown("⬇️")
+
+    # === ÇEKİRDEK MODEL ===
+    st.subheader("🧠 Dijital İkiz Model Çekirdeği")
+    st.latex(r"""
+    R(t)= w_1 I(t) + w_2 G(t) - w_3 U(t) - w_4 S(t) + w_5 I(t)\cdot G(t)
+    """)
+    st.latex(r"""
+    P(t)=P(t-1)+\alpha \cdot R(t)
+    """)
+
+    st.markdown("""
+    - Risk **anlık değil**, zamanla **birikimli** hesaplanır  
+    - İzolasyon süresine bağlı **gecikmeli kırılma davranışı** modellenir  
+    """)
+
+    st.markdown("⬇️")
+
+    # === İNDEKSLER ===
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("🧠 Psikolojik Stres İndeksi (PSI)")
+        st.markdown("""
+        - Algılanan stres  
+        - Bilişsel yorgunluk  
+        - Duygudurum dalgalanması  
+        """)
+
+    with col2:
+        st.subheader("💓 Fizyolojik Yüklenme İndeksi (FYI)")
+        st.markdown("""
+        - Uyku bozulması  
+        - Sirkadiyen ritim  
+        - **HRV & SpO₂ → şiddetlendirici katsayı (β)**  
+        """)
+
+    st.markdown("⬇️")
+
+    # === BÜTÜNLEŞİK SKOR ===
+    st.subheader("📊 Bütünleşik Psikofizyolojik Risk Skoru (BPRS)")
+    st.latex(r"""
+    BPRS(t) = (PSI + FYI) \times \gamma(t)
+    """)
+
+    st.markdown("""
+    - İzolasyon süresiyle etkileşimlidir  
+    - **60. gün sonrası doğrusal olmayan risk artışı** temsil edilir  
+    """)
+
+    st.markdown("⬇️")
+
+    # === ERKEN UYARI ===
+    st.subheader("🚨 Erken Risk Uyarı Mekanizması")
+    st.latex(r"""
+    \text{If } \frac{d(BPRS)}{dt} > \theta \Rightarrow \text{ALERT}
+    """)
+
+    st.markdown("""
+    - Mutlak skor yerine **değişim hızı** izlenir  
+    - Kritik eşik aşıldığında sistem uyarı üretir  
+    """)
+
+    st.markdown("---")
+
+    # === KALİBRASYON VURGUSU (ÇOK KRİTİK) ===
+    st.success(
+        "🔁 Bu dijital ikiz mimarisi, giyilebilir sensörlerden elde edilecek "
+        "gerçek dünya verileri ile **kalibre edilebilir şekilde tasarlanmıştır**. "
+        "Mevcut çalışma, klinik doğrulama içermeyen simülasyon tabanlı bir altyapı sunmaktadır."
+    )
 
 elif sayfa_secimi == "🚨 Acil Durum Rehberi":
     st.title("🚨 Acil Durum Protokolleri")
