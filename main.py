@@ -387,4 +387,23 @@ with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar Hakkında"
     **Geliştirme Ortamı:** Replit | Streamlit | Python tabanlı karar destek sistemi.
     """)
     st.info("Bu model, Palinkas ve Suedfeld (2008) ile Stuster (2016) tarafından tanımlanan izolasyon evreleri ve literatürdeki fizyolojik eşik değerlerle %100 uyumlu çalışmaktadır.")
+elif page == "Dijital İkiz Gerçek Veri Entegrasyonu":
+
+    st.header("🔗 Dijital İkiz – Gerçek Veri Entegrasyon Akışı")
+
+    st.markdown("""
+    Bu sayfa, dijital ikiz modelinin harici sensör verileriyle
+    kalibre edilebilir bir sisteme dönüştürülmesini amaçlayan
+    kavramsal ve deneysel veri akışını göstermektedir.
+    """)
+    st.subheader("📥 Sensör Verisi Yükleme")
+
+    uploaded_file = st.file_uploader(
+        "CSV formatında sensör verisi yükleyiniz",
+        type=["csv"]
+    )
+
+    if uploaded_file is not None:
+        df_sensor = pd.read_csv(uploaded_file)
+        st.write("Yüklenen veri önizlemesi:", df_sensor.head())
 
