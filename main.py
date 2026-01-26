@@ -49,7 +49,16 @@ st.markdown("""
 
 # 2. SOL PANEL (DEĞİŞKENLER) - Her sayfada görünmesi için if dışında tutuyoruz
 st.sidebar.title("🚀 Görev Kontrol")
-sayfa_secimi = st.sidebar.selectbox("Bölüm Seçiniz:", ["🏠 Ana Kontrol Paneli", "📊 Fizyolojik Derin Analiz", "🚨 Acil Durum Rehberi"])
+sayfa_secimi = st.sidebar.selectbox(
+    "Bölüm Seçiniz:",
+    [
+        "🏠 Ana Kontrol Paneli",
+        "📊 Fizyolojik Derin Analiz",
+        "🚨 Acil Durum Rehberi",
+        "📡 Gerçek Veri Entegrasyonu"
+    ]
+)
+
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("📥 Canlı Parametreler")
