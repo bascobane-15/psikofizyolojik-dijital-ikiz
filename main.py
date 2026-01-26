@@ -387,4 +387,14 @@ with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar Hakkında"
     **Geliştirme Ortamı:** Replit | Streamlit | Python tabanlı karar destek sistemi.
     """)
     st.info("Bu model, Palinkas ve Suedfeld (2008) ile Stuster (2016) tarafından tanımlanan izolasyon evreleri ve literatürdeki fizyolojik eşik değerlerle %100 uyumlu çalışmaktadır.")
+# --- SYSTEM MEMORY (SAFE STEP 1) ---
+if "system_history" not in st.session_state:
+    st.session_state.system_history = []
+# --- DATA INPUT GATEWAY (SAFE STEP 2) ---
+st.markdown("### 📥 Harici Veri Girişi (Opsiyonel)")
+
+uploaded_file = st.file_uploader(
+    "Sensör verisi yükle (CSV)", 
+    type=["csv"]
+)
 
