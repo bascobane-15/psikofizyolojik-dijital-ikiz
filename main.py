@@ -261,9 +261,47 @@ elif sayfa_secimi == "🚨 Acil Durum Rehberi":
 
         **Not:** Bu yapı klinik tanı değil, erken risk farkındalığı amaçlıdır.
         """)
-st.write("SEÇİLEN SAYFA:", sayfa_secimi)
+elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
 
-SEÇİLEN SAYFA: 📡 Gerçek Veri Entegrasyonu
+    st.title("📡 Gerçek Veri Entegrasyonu")
+    st.markdown("---")
+
+    # === 1. SAYFA ÇALIŞIYOR MU TESTİ ===
+    st.success("✅ Sayfa başarıyla yüklendi. (Bu mesajı görüyorsan sorun yok)")
+
+    st.markdown("""
+    Bu sayfa, dijital ikiz modeline **gerçek zamanlı fizyolojik veri** entegrasyonu
+    için hazırlanmıştır.
+    """)
+
+    st.markdown("---")
+
+    # === 2. MANUEL VERİ GİRİŞİ (ŞİMDİLİK SAHTE AMA GÖRÜNÜR) ===
+    st.subheader("🧪 Manuel Fizyolojik Veri Girişi")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        hrv = st.number_input(
+            "💓 HRV (ms)",
+            min_value=10,
+            max_value=150,
+            value=60
+        )
+
+    with col2:
+        spo2 = st.number_input(
+            "🫁 SpO₂ (%)",
+            min_value=80,
+            max_value=100,
+            value=96
+        )
+
+    with col3:
+        nabiz = st.number_input(
+            "❤️ Nabız (bpm)",
+            min_value=40,
+
 
 
 
