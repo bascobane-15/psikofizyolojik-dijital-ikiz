@@ -275,3 +275,15 @@ elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
 
     st.info("Bu aşamada sistem simülasyon modundadır. Gerçek veri alınmamaktadır.")
 
+    st.subheader("📥 Sensör Verisi Girişi (Simülasyon)")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        live_hrv = st.number_input("HRV (ms)", min_value=20, max_value=120, value=55)
+
+    with col2:
+        live_spo2 = st.number_input("SpO₂ (%)", min_value=85, max_value=100, value=98)
+
+    with col3:
+        live_nabiz = st.number_input("Nabız (bpm)", min_value=40, max_value=150, value=72)
