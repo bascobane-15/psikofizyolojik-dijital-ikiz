@@ -307,6 +307,15 @@ elif sayfa_secimi == "🧩 Dijital İkiz Veri Akışı":
         "gerçek dünya verileri ile **kalibre edilebilir şekilde tasarlanmıştır**. "
         "Mevcut çalışma, klinik doğrulama içermeyen simülasyon tabanlı bir altyapı sunmaktadır."
     )
+elif page == "Dijital İkiz Gerçek Veri Entegrasyonu":
+
+    st.header("🔗 Dijital İkiz – Gerçek Veri Entegrasyon Akışı")
+
+    st.markdown("""
+    Bu sayfa, dijital ikiz modelinin harici sensör verileriyle
+    kalibre edilebilir bir sisteme dönüştürülmesini amaçlayan
+    kavramsal ve deneysel veri akışını göstermektedir.
+    """)
 
 elif sayfa_secimi == "🚨 Acil Durum Rehberi":
     st.title("🚨 Acil Durum Protokolleri")
