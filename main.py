@@ -307,6 +307,21 @@ elif sayfa_secimi == "🧩 Dijital İkiz Veri Akışı":
         "gerçek dünya verileri ile **kalibre edilebilir şekilde tasarlanmıştır**. "
         "Mevcut çalışma, klinik doğrulama içermeyen simülasyon tabanlı bir altyapı sunmaktadır."
     )
+uploaded_file = st.file_uploader("Sensör verisi yükle (CSV)", type=["csv"])
+
+if uploaded_file:
+    df_sensor = pd.read_csv(uploaded_file)
+    hrv = df_sensor["HRV"].iloc[-1]
+    spo2 = df_sensor["SpO2"].iloc[-1]
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+st.session_state.history.append({
+    "time": pd.Timestamp.now(),
+    "HRV": hrv,
+    "SpO2": spo2,
+    "BPRS": risk_skoru
+})
 
 elif sayfa_secimi == "🚨 Acil Durum Rehberi":
     st.title("🚨 Acil Durum Protokolleri")
