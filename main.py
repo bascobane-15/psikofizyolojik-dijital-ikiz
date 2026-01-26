@@ -262,12 +262,16 @@ elif sayfa_secimi == "🚨 Acil Durum Rehberi":
         **Not:** Bu yapı klinik tanı değil, erken risk farkındalığı amaçlıdır.
         """)
 
-elif page == "Dijital İkiz Gerçek Veri Entegrasyonu":
+elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
 
-    st.header("🔗 Dijital İkiz – Gerçek Veri Entegrasyon Akışı")
+    st.title("📡 Dijital İkiz – Gerçek Veri Entegrasyonu")
+    st.markdown("---")
 
-    st.markdown("""
-    Bu sayfa, dijital ikiz modelinin harici sensör verileriyle
-    kalibre edilebilir bir sisteme dönüştürülmesini amaçlayan
-    kavramsal ve deneysel veri akışını göstermektedir.
+    st.write("""
+    Bu sayfa, dijital ikiz modelinin gelecekte
+    **gerçek sensör verileriyle** nasıl besleneceğini
+    kavramsal olarak göstermektedir.
     """)
+
+    st.info("Bu aşamada sistem simülasyon modundadır. Gerçek veri alınmamaktadır.")
+
