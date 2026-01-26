@@ -316,6 +316,10 @@ uploaded_file = st.file_uploader(
     "Sensör verisi yükle (CSV)", 
     type=["csv"]
 )
+# --- READ SENSOR DATA (SAFE STEP 3) ---
+if uploaded_file is not None:
+    df_sensor = pd.read_csv(uploaded_file)
+    st.write("Yüklenen veri önizlemesi:", df_sensor.head())
 
 
 
