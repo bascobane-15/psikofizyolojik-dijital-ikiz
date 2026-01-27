@@ -358,9 +358,7 @@ elif sayfa_secimi == "🧩 Dijital İkiz Veri Mimarisi":
         "🔁 Bu dijital ikiz mimarisi, giyilebilir sensörlerden elde edilecek "
         "gerçek dünya verileri ile **kalibre edilebilir şekilde tasarlanmıştır**. "
         "Mevcut çalışma, klinik doğrulama içermeyen simülasyon tabanlı bir altyapı sunmaktadır."
-    )
-
-elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
+    )elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
     st.title("📡 Gerçek Veri Entegrasyonu")
     
     GAMMA_HYPOXIC = 1.15 
@@ -368,38 +366,51 @@ elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
 
     if uploaded_file is not None:
         try:
+            # 1. Veriyi Oku ve Temizle
             df_sensor = pd.read_csv(uploaded_file, sep=None, engine='python')
-            df_sensor.columns = df_sensor.columns.str.lower().str.strip()
+            df_sensor.columns = [c.strip().lower() for c in df_sensor.columns]
             
-            # --- HESAPLAMA ---
+            # 2. Risk Skorunu Hesapla
             def hesapla_bprs(row):
-                psi = 20 + (15 if row['hrv'] < 45 else 0)
-                fyi = 10 + (10 if row['nabiz'] > 80 else 0)
-                gamma = GAMMA_HYPOXIC if row['spo2'] < 94 else 1.0
+                psi = 20 + (15 if float(row['hrv']) < 45 else 0)
+                fyi = 10 + (10 if float(row['nabiz']) > 80 else 0)
+                gamma = GAMMA_HYPOXIC if float(row['spo2']) < 94 else 1.0
                 return (psi + fyi) * gamma
 
             df_sensor['risk_skoru'] = df_sensor.apply(hesapla_bprs, axis=1)
 
-            # --- GÖRSELLEŞTİRME ---
-            st.success("Veri seti başarıyla yüklendi! ✅")
+            st.success("Veri seti başarıyla yüklendi ve analiz edildi! ✅")
+
+            # --- 3. ÖZET METRİK KUTULARI (Geri Getirdiğimiz Bölüm) ---
+            st.markdown("### 📊 Dijital İkiz Analiz Sonuçları")
+            m1, m2, m3 = st.columns(3)
+            with m1:
+                st.metric("Yüklenen Veri Satırı", len(df_sensor))
+            with m2:
+                st.metric("Ortalama Risk Skoru", f"%{df_sensor['risk_skoru'].mean():.1f}")
+            with m3:
+                son_risk = df_sensor['risk_skoru'].iloc[-1]
+                st.metric("Son Kayıt Risk Durumu", f"%{son_risk:.1f}", 
+                          delta="KRİTİK" if son_risk > 40 else "STABİL", delta_color="inverse")
+
+            # --- 4. GRAFİK ---
+            st.write("**Bütünleşik Risk Skoru (BPRS) Zaman Serisi**")
             st.area_chart(df_sensor['risk_skoru'])
 
-            # --- AKILLI ACİL DURUM TETİKLEYİCİ (BURADA OLMALI) ---
+            # --- 5. AKILLI ACİL DURUM TETİKLEYİCİ ---
             st.markdown("---")
             max_risk_degeri = df_sensor['risk_skoru'].max()
             
             if max_risk_degeri > 50:
                 st.error(f"⚠️ KRİTİK ALARM: Risk skoru %{max_risk_degeri:.1f} seviyesine ulaştı!")
-                st.info("Lütfen 'Acil Durum Rehberi' sayfasındaki **Psikolojik Müdahale** protokolünü inceleyin.")
+                st.info("💡 **Öneri:** Lütfen 'Acil Durum Rehberi' sayfasındaki **Psikolojik Müdahale** protokolünü inceleyin.")
             elif max_risk_degeri > 40:
                 st.warning(f"🔔 DİKKAT: Orta düzey risk artışı tespit edildi (%{max_risk_degeri:.1f}).")
 
-            # --- TABLO EN ALTTA KALSIN ---
+            # --- 6. TABLO ---
             with st.expander("Hesaplanmış Veri Tablosunu Gör"):
                 st.dataframe(df_sensor)
 
         except Exception as e:
-            st.error(f"Hata oluştu: {e}")
-
-   
+            st.error(f"Hata: {e}")
 
