@@ -358,7 +358,9 @@ elif sayfa_secimi == "🧩 Dijital İkiz Veri Mimarisi":
         "🔁 Bu dijital ikiz mimarisi, giyilebilir sensörlerden elde edilecek "
         "gerçek dünya verileri ile **kalibre edilebilir şekilde tasarlanmıştır**. "
         "Mevcut çalışma, klinik doğrulama içermeyen simülasyon tabanlı bir altyapı sunmaktadır."
-    )elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
+    )
+
+elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
     st.title("📡 Gerçek Veri Entegrasyonu")
     
     GAMMA_HYPOXIC = 1.15 
@@ -413,4 +415,3 @@ elif sayfa_secimi == "🧩 Dijital İkiz Veri Mimarisi":
 
         except Exception as e:
             st.error(f"Hata: {e}")
-
