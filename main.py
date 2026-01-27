@@ -75,6 +75,27 @@ nabiz = st.sidebar.number_input("Nabız (bpm)", 40, 150, 72)
 spo2 = st.sidebar.number_input("Oksijen (SpO2 %)", 80, 100, 98)
 hrv = st.sidebar.number_input("HRV Skoru", 10, 100, 55)
 
+# ==========================================
+# 📡 AKTİF VERİ KAYNAĞI SEÇİMİ (CSV > Sidebar)
+# ==========================================
+
+if uploaded_file is not None:
+    # CSV'den son satırı al (en güncel veri varsayımı)
+    aktif_hrv = int(df_sensor["HRV"].iloc[-1])
+    aktif_spo2 = int(df_sensor["SpO2"].iloc[-1])
+    aktif_nabiz = int(df_sensor["Nabiz"].iloc[-1])
+
+    st.success("📡 Aktif veri kaynağı: CSV dosyası")
+
+else:
+    # CSV yoksa sidebar değerlerini kullan
+    aktif_hrv = hrv
+    aktif_spo2 = spo2
+    aktif_nabiz = nabiz
+
+    st.info("⌚ Aktif veri kaynağı: Manuel giriş (Sidebar)")
+
+
 # --- RİSK HESAPLAMA MOTORU ---
 def akademik_risk_hesapla():
     # --- 1. PSİKOLOJİK STRES İNDEKSİ (PSİ) HESABI ---
@@ -85,7 +106,7 @@ def akademik_risk_hesapla():
     if sosyal_etkilesim == "Çok Sınırlı": p_skor += 25
     
     # [TABLO 6 KURALI]: HRV normalin %20 altına düşerse (Örn: <45) PSİ'ye +15 puan ekle
-    if hrv < 45: 
+    if aktif_hrv < 45: 
         p_skor += 15
 
     # --- 2. FİZYOLOJİK YÜKLENME İNDEKSİ (FYİ) HESABI ---
@@ -93,7 +114,7 @@ def akademik_risk_hesapla():
     if uyku < 6: f_skor += 30
     
     # [TABLO 6 KURALI]: Dinlenme Nabzı > 80 bpm ise FYİ'ye +10 puan ekle
-    if nabiz > 80:
+    if aktif_nabiz > 80:
         f_skor += 10
     
     # --- 3. IŞIK RİSKİ ---
@@ -104,7 +125,7 @@ def akademik_risk_hesapla():
     toplam_risk = (p_skor + f_skor + isik_riski) / 3
     
     # [TABLO 6 KURALI]: Oksijen %94'ün altına inerse BPRS skoru 1.15 ile çarpılır
-    if spo2 < 94:
+    if aktif_spo2 < 94:
         toplam_risk = toplam_risk * 1.15
         
     # [TABLO 6 KURALI]: Uyku kalitesi (derin uyku) düşükse genel risk %20 artar
