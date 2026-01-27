@@ -49,16 +49,7 @@ st.markdown("""
 
 # 2. SOL PANEL (DEĞİŞKENLER) - Her sayfada görünmesi için if dışında tutuyoruz
 st.sidebar.title("🚀 Görev Kontrol")
-sayfa_secimi = st.sidebar.selectbox(
-    "Bölüm Seçiniz:",
-    [
-        "🏠 Ana Kontrol Paneli",
-        "📊 Fizyolojik Derin Analiz",
-        "🚨 Acil Durum Rehberi",
-        "🧩 Dijital İkiz Veri Mimarisi",
-        "📡 Gerçek Veri Entegrasyonu"
-    ]
-)
+sayfa_secimi = st.sidebar.selectbox("Bölüm Seçiniz:", ["🏠 Ana Kontrol Paneli", "📊 Fizyolojik Derin Analiz", "🚨 Acil Durum Rehberi"])
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("📥 Canlı Parametreler")
@@ -75,27 +66,6 @@ nabiz = st.sidebar.number_input("Nabız (bpm)", 40, 150, 72)
 spo2 = st.sidebar.number_input("Oksijen (SpO2 %)", 80, 100, 98)
 hrv = st.sidebar.number_input("HRV Skoru", 10, 100, 55)
 
-# ==========================================
-# 📡 AKTİF VERİ KAYNAĞI SEÇİMİ (CSV > Sidebar)
-# ==========================================
-
-if uploaded_file is not None:
-    # CSV'den son satırı al (en güncel veri varsayımı)
-    aktif_hrv = int(df_sensor["HRV"].iloc[-1])
-    aktif_spo2 = int(df_sensor["SpO2"].iloc[-1])
-    aktif_nabiz = int(df_sensor["Nabiz"].iloc[-1])
-
-    st.success("📡 Aktif veri kaynağı: CSV dosyası")
-
-else:
-    # CSV yoksa sidebar değerlerini kullan
-    aktif_hrv = hrv
-    aktif_spo2 = spo2
-    aktif_nabiz = nabiz
-
-    st.info("⌚ Aktif veri kaynağı: Manuel giriş (Sidebar)")
-
-
 # --- RİSK HESAPLAMA MOTORU ---
 def akademik_risk_hesapla():
     # --- 1. PSİKOLOJİK STRES İNDEKSİ (PSİ) HESABI ---
@@ -106,7 +76,7 @@ def akademik_risk_hesapla():
     if sosyal_etkilesim == "Çok Sınırlı": p_skor += 25
     
     # [TABLO 6 KURALI]: HRV normalin %20 altına düşerse (Örn: <45) PSİ'ye +15 puan ekle
-    if aktif_hrv < 45: 
+    if hrv < 45: 
         p_skor += 15
 
     # --- 2. FİZYOLOJİK YÜKLENME İNDEKSİ (FYİ) HESABI ---
@@ -114,7 +84,7 @@ def akademik_risk_hesapla():
     if uyku < 6: f_skor += 30
     
     # [TABLO 6 KURALI]: Dinlenme Nabzı > 80 bpm ise FYİ'ye +10 puan ekle
-    if aktif_nabiz > 80:
+    if nabiz > 80:
         f_skor += 10
     
     # --- 3. IŞIK RİSKİ ---
@@ -125,7 +95,7 @@ def akademik_risk_hesapla():
     toplam_risk = (p_skor + f_skor + isik_riski) / 3
     
     # [TABLO 6 KURALI]: Oksijen %94'ün altına inerse BPRS skoru 1.15 ile çarpılır
-    if aktif_spo2 < 94:
+    if spo2 < 94:
         toplam_risk = toplam_risk * 1.15
         
     # [TABLO 6 KURALI]: Uyku kalitesi (derin uyku) düşükse genel risk %20 artar
@@ -200,38 +170,122 @@ if sayfa_secimi == "🏠 Ana Kontrol Paneli":
         st.write(f"**Işık Durumu:** {isik_maruziyeti}")
         st.write(f"**Uyku Düzeni:** {uyku} Saat")
 
-elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
-    st.title("📡 Gerçek Veri Entegrasyonu")
+elif sayfa_secimi == "📊 Fizyolojik Derin Analiz":
+    st.title("📊 Detaylı Sağlık Analizi")
+    st.markdown("---")
     
-    # 1. ÖNCE DEĞİŞKENİ TANIMLA (Hatanın çözümü burası)
-    uploaded_file = st.file_uploader("Sensör verisi yükle (CSV)", type=["csv"])
+    # Veri Tanımlamaları (Hata almamak için güvenli yöntem)
+    current_nabiz = nabiz if 'nabiz' in locals() else 72
+    current_hrv = hrv if 'hrv' in locals() else 55
+    current_oksijen = oksijen if 'oksijen' in locals() else 98
 
-    # 2. SONRA KONTROL ET
-    if uploaded_file is not None:
-        try:
-            # Otomatik ayırıcı tanıma
-            df_sensor = pd.read_csv(uploaded_file, sep=None, engine='python')
-            df_sensor.columns = [c.strip().lower() for c in df_sensor.columns]
-            
-            # --- DİJİTAL İKİZ HESAPLAMA ---
-            def hesapla_bprs(row):
-                # Formül: (PSI + FYI) * Gamma
-                psi = 20 + (15 if float(row['hrv']) < 45 else 0)
-                fyi = 10 + (10 if float(row['nabiz']) > 80 else 0)
-                gamma = 1.15 if float(row['spo2']) < 94 else 1.0
-                return (psi + fyi) * gamma
+    st.info(f"Anlık İzleme: Nabız {current_nabiz} bpm | HRV {current_hrv} | Oksijen %{current_oksijen}")
+    
+    # --- ÜST SIRA: 2 GRAFİK YAN YANA ---
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        # 1. GRAFİK: NABIZ (Çizgi Grafik)
+        df_n = pd.DataFrame({'Zaman': range(24), 'Nabız': np.random.normal(current_nabiz, 2, 24)})
+        fig_n = px.line(df_n, x='Zaman', y='Nabız', title="💓 24 Saatlik Nabız Takibi", template="plotly_dark")
+        fig_n.update_traces(line_color='#4A90E2')
+        st.plotly_chart(fig_n, use_container_width=True)
 
-            df_sensor['risk_skoru'] = df_sensor.apply(hesapla_bprs, axis=1)
+    with col2:
+        # 2. GRAFİK: HRV (Sütun Grafik)
+        df_h = pd.DataFrame({'Zaman': range(24), 'HRV': np.random.normal(current_hrv, 4, 24)})
+        fig_h = px.bar(df_h, x='Zaman', y='HRV', title="📊 HRV Stabilite Değerleri", template="plotly_dark", color_discrete_sequence=['#00d4ff'])
+        st.plotly_chart(fig_h, use_container_width=True)
 
-            st.success("✅ Veriler Analiz Edildi!")
-            st.area_chart(df_sensor['risk_skoru'])
-            st.dataframe(df_sensor)
+    # --- ALT SIRA: TEK GRAFİK ---
+    st.markdown("---")
+    # 3. GRAFİK: OKSİJEN (Alan Grafik)
+    df_o = pd.DataFrame({'Zaman': range(24), 'Oksijen': np.random.normal(current_oksijen, 0.5, 24)})
+    fig_o = px.area(df_o, x='Zaman', y='Oksijen', title="🫁 Oksijen (SpO2 %) Seviyesi - Geniş İzleme", template="plotly_dark")
+    fig_o.update_traces(fillcolor='rgba(160, 214, 232, 0.4)', line_color='#A0D6E8')
+    fig_o.update_yaxes(range=[85, 105]) # Oksijen değerini daha net görmek için ölçekleme
+    
+    st.plotly_chart(fig_o, use_container_width=True)
 
-        except Exception as e:
-            st.error(f"Veri işleme hatası: {e}")
+elif sayfa_secimi == "🚨 Acil Durum Rehberi":
+    st.title("🚨 Acil Durum Protokolleri")
+    st.markdown("---")
+    
+    # --- 1. CANLI DURUM ANALİZİ (Okunabilirliği artırılmış) ---
+    if risk_skoru > 60:
+        st.warning(f"### ⚠️ DİKKAT: Risk Skorunuz %{risk_skoru}")
+        st.write("Şu anki verileriniz yüksek risk grubundadır. Lütfen aşağıdaki adımları sırasıyla takip edin.")
     else:
-        # Dosya yüklenmediyse gösterilecek varsayılan mesaj
-        st.info("Lütfen analiz için bir CSV dosyası sürükleyip bırakın.")
+        st.success("### ✅ Durum Stabil")
+        st.write("Risk seviyeniz güvenli aralıkta. Aşağıdaki protokoller önleyici bilgi amaçlıdır.")
+
+    # Parantez içindeki (Tablo 1 & 6) ibaresi kaldırıldı
+    st.error("Kritik Seviye Müdahaleleri")
+
+    # --- 2. MEVCUT GENİŞLETİLEBİLİR PANELLER ---
+    with st.expander("🔴 Psikolojik Müdahale (%70+ Risk)"):
+        st.markdown("#### **Uygulanacak Adımlar:**")
+        st.write("- **Sosyal Etkileşim:** Personel derhal sosyal etkileşime yönlendirilmelidir.")
+        st.write("- **Uyku Standardı:** Uyku düzeni 8 saate sabitlenmelidir.")
+
+    with st.expander("🟡 Fizyolojik Müdahale (Düşük SpO2/HRV)"):
+        st.markdown("#### **Uygulanacak Adımlar:**")
+        st.write("- **Havalandırma:** Oksijen satürasyonu %94 altındaysa ortam havalandırması kontrol edilmelidir.")
+        st.write("- **Aktivite Kısıtlaması:** HRV skoru 40 altındaysa fiziksel aktivite derhal kısıtlanmalıdır.")
+
+    # --- 3. MÜDAHALE EŞİK DEĞERLERİ (Tablo yerine büyük yazılı kartlar) ---
+    st.markdown("---")
+    st.subheader("📊 Müdahale Eşik Değerleri")
+    
+    col_x, col_y, col_z = st.columns(3)
+    
+    with col_x:
+        st.markdown("""
+        **🫁 HİPOKSİ** **Eşik:** SpO2 < %94  
+        **Aksiyon:** Oksijen Desteği
+        """)
+        
+    with col_y:
+        st.markdown("""
+        **🧠 OSS YORGUNLUĞU** **Eşik:** HRV < 45 ms  
+        **Aksiyon:** Aktif Dinlenme
+        """)
+        
+    with col_z:
+        st.markdown("""
+        **📉 KRİTİK RİSK** **Eşik:** Risk > %70  
+        **Aksiyon:** Görev Durdurma
+        """)
+
+    # --- 4. AKADEMİK REFERANS BİLGİ KUTUSU ---
+    st.markdown("---")
+    with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar"):
+        st.markdown(f"""
+        **Metodoloji:** Bu protokoller, **Tablo 6**'daki fizyolojik katsayılar ve **Tablo 7**'deki dinamik bütünleşik risk hesaplamalarına (BPRS) göre anlık olarak filtrelenmektedir. 
+        
+        **Önemli Not:** Oksijen seviyesindeki her düşüş, tüm riskleri **1.15 katsayısı** ile şiddetlendirir.
+        """)
+    # --- 4. MEVCUT BİLGİ KUTUSU (Geliştirildi) ---
+    st.markdown("---")
+    with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar Hakkında"):
+        st.write("**Metodoloji:** Bu protokoller, Tablo 6'daki fizyolojik katsayılar ve Tablo 7'deki bütünleşik risk hesaplamalarına göre dinamik olarak filtrelenmektedir.")
+        st.write("**Referans:** Palinkas ve Suedfeld (2008), Uzay ve Antarktika Görevlerinde Psikofizyolojik Uyum Protokolleri.")
+# --- SAYFA SONU: DİJİTAL İKİZ HAKKINDA BİLGİ KUTUSU ---
+st.markdown("---")
+with st.expander("ℹ️ Dijital İkiz Modeli ve Akademik Referanslar Hakkında"):
+    st.markdown(f"""
+    ### 🔬 Psikofizyolojik Dijital İkiz Metodolojisi
+    Bu simülasyon, kutup araştırmacılarının ekstrem koşullardaki biyo-psikolojik yanıtlarını modellemek amacıyla **Tablo 6 (Fizyolojik Katsayılar)** ve **Tablo 7 (Dinamik Entegrasyon)** verileri temel alınarak geliştirilmiştir.
+    
+    **Temel Algoritmalar:**
+    * **Şiddetlendirme Katsayısı:** Oksijen satürasyonunun (SpO2) %94'ün altına düşmesi, Bütünleşik Risk Skorunu (BPRS) **1.15 kat** artırarak hipoksik stresi simüle eder.
+    * **Psikolojik Stres Artışı (PSİ):** HRV değerinin normalin %20 altına düşmesi, modele doğrudan **+15 puanlık** bir stres yükü ekler.
+    * **Fizyolojik Yüklenme (FYİ):** Dinlenme nabzının 80 bpm üzerine çıkması, fiziksel kondisyon kaybını temsilen **+10 puanlık** bir yük tetikler.
+    * **Kümülatif Yük:** Yetersiz uyku (<2 saat derin uyku veya <5 saat toplam uyku) genel risk projeksiyonunu **%20 oranında** yukarı çeker.
+
+    **Geliştirme Ortamı:** Replit | Streamlit | Python tabanlı karar destek sistemi.
+    """)
+    st.info("Bu model, Palinkas ve Suedfeld (2008) ile Stuster (2016) tarafından tanımlanan izolasyon evreleri ve literatürdeki fizyolojik eşik değerlerle %100 uyumlu çalışmaktadır.")
 
 
    
