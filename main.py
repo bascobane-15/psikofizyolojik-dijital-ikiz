@@ -379,86 +379,70 @@ elif sayfa_secimi == "🧩 Dijital İkiz Veri Mimarisi":
         "🔁 Bu dijital ikiz mimarisi, giyilebilir sensörlerden elde edilecek "
         "gerçek dünya verileri ile **kalibre edilebilir şekilde tasarlanmıştır**. "
         "Mevcut çalışma, klinik doğrulama içermeyen simülasyon tabanlı bir altyapı sunmaktadır."
-    )
-elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
+    )elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
     st.title("📡 Gerçek Veri Entegrasyonu")
-    st.markdown("---")
-
-    # --- CANLI VERİ AKIŞI SİMÜLASYONU ---
-    # Bu kısım, sanki bir akıllı saatten veri geliyormuş gibi session_state kullanır
-    import numpy as np
-    import time
-
-    st.markdown("### 💓 Anlık Sensör İzleme (Real-Time)")
     
-    # Başlangıç değerleri (session_state yoksa ata)
-    if 'live_hrv' not in st.session_state:
-        st.session_state.live_hrv = 55
-        st.session_state.live_spo2 = 98
-        st.session_state.live_pulse = 72
+    # --- FORMÜL PARAMETRELERİ (Metodolojine Sadık Kalarak) ---
+    # Sabit çarpanlar ve eşikler
+    GAMMA_HYPOXIC = 1.15  # SpO2 < 94 için şiddetlendirme katsayısı
+    STRESS_BONUS = 15     # Düşük HRV için stres puanı
+    PHYSICAL_BONUS = 10   # Yüksek Nabız için yüklenme puanı
 
-    # Verileri hafifçe dalgalandırarak canlılık hissi verelim
-    col1, col2, col3 = st.columns(3)
-    
-    # Eşik değer kontrolü ve Renklendirme
-    hrv_delta = np.random.randint(-2, 3)
-    spo2_val = st.session_state.live_spo2 
-    pulse_val = st.session_state.live_pulse + np.random.randint(-1, 2)
-
-    with col1:
-        st.metric(label="🧠 HRV", value=f"{st.session_state.live_hrv + hrv_delta} ms", delta=f"{hrv_delta}", 
-                  help="45ms altı yüksek stres göstergesidir.")
-    
-    with col2:
-        # SpO2 %94 altındaysa kırmızı göster (delta ile)
-        status = "Normal" if spo2_val >= 94 else "KRİTİK"
-        st.metric(label="🫁 SpO₂", value=f"%{spo2_val}", delta=status, delta_color="normal" if spo2_val >= 94 else "inverse")
-
-    with col3:
-        st.metric(label="💓 Nabız", value=f"{pulse_val} bpm", delta=f"{pulse_val - 72}", delta_color="inverse")
-
-    st.markdown("---")
-
-    # --- CSV VERİ ANALİZ KATMANI ---
-    st.markdown("### 📥 Harici Veri Girişi ve Model Analizi")
-    
     uploaded_file = st.file_uploader("Sensör verisi yükle (CSV)", type=["csv"])
 
     if uploaded_file is not None:
         try:
-            # CSV'yi oku (Sizin kodunuzdaki yapı)
             df_sensor = pd.read_csv(uploaded_file, sep=";")
             df_sensor.columns = df_sensor.columns.str.lower()
             
-            st.success("Veri seti başarıyla doğrulandı. Model entegrasyonu hazır. ✅")
+            # --- DİJİTAL İKİZ HESAPLAMA MOTORU ---
+            def hesapla_bprs(row):
+                # 1. Psikolojik Stres İndeksi (PSI) Tahmini (HRV tabanlı)
+                # HRV 45ms altındaysa stres +15 artar (Varsayılan baz: 20)
+                psi = 20 + (STRESS_BONUS if row['hrv'] < 45 else 0)
+                
+                # 2. Fizyolojik Yüklenme İndeksi (FYI) (Nabız tabanlı)
+                # Nabız 80 bpm üzerindeyse yüklenme +10 artar
+                fyi = 10 + (PHYSICAL_BONUS if row['nabiz'] > 80 else 0)
+                
+                # 3. Şiddetlendirme Katsayısı (Gamma - Hipoksi Durumu)
+                gamma = GAMMA_HYPOXIC if row['spo2'] < 94 else 1.0
+                
+                # Formül: BPRS = (PSI + FYI) * Gamma
+                return (psi + fyi) * gamma
+
+            # Hesaplamayı tüm satırlara uygula
+            df_sensor['risk_skoru'] = df_sensor.apply(hesapla_bprs, axis=1)
             
-            # Geliştirme: Sadece tabloyu gösterme, veriyi analiz et
-            col_a, col_b = st.columns([1, 2])
-            
-            with col_a:
-                st.write("**Veri Önizleme:**")
-                st.dataframe(df_sensor.head(5))
-            
-            with col_b:
-                st.write("**Zamana Bağlı Risk Analizi (Model Çıktısı):**")
-                # Eğer CSV'de 'nabiz' veya 'hrv' varsa anlık grafik oluşturur
-                if 'nabiz' in df_sensor.columns:
-                    st.line_chart(df_sensor['nabiz'])
-                else:
-                    st.warning("Grafik oluşturmak için 'nabiz' sütunu bulunamadı.")
-            
-            # --- KRİTİK ANALİZ ---
-            if 'spo2' in df_sensor.columns:
-                kritik_anlar = df_sensor[df_sensor['spo2'] < 94]
-                if not kritik_anlar.empty:
-                    st.error(f"⚠️ Dikkat: Yüklenen veride {len(kritik_anlar)} adet hipoksi riski (SpO2 < %94) tespit edildi!")
-        
+            st.success("Dijital İkiz Çekirdeği: Veriler analiz edildi ve risk skorları hesaplandı. ✅")
+
+            # --- GÖRSEL ANALİZ ---
+            col_metrics, col_chart = st.columns([1, 2])
+
+            with col_metrics:
+                ortalama_risk = df_sensor['risk_skoru'].mean()
+                max_risk = df_sensor['risk_skoru'].max()
+                
+                st.metric("Ortalama Görev Riski", f"%{ortalama_risk:.1f}")
+                st.metric("Pik Risk Seviyesi", f"%{max_risk:.1f}", 
+                          delta="KRİTİK" if max_risk > 50 else "STABİL",
+                          delta_color="inverse")
+
+            with col_chart:
+                st.write("**Zamana Bağlı Bütünleşik Risk Projeksiyonu**")
+                st.area_chart(df_sensor['risk_skoru'])
+
+            # --- ÖZEL DURUM ANALİZİ ---
+            st.markdown("### 🔍 Anomali Detayları")
+            kritik_segment = df_sensor[df_sensor['risk_skoru'] > 40]
+            if not kritik_segment.empty:
+                st.warning(f"Sistem, simülasyon boyunca {len(kritik_segment)} adet yüksek riskli an tespit etti.")
+                st.dataframe(kritik_segment)
+            else:
+                st.info("Analiz sonucunda yüksek riskli bir anomaliye rastlanmadı.")
+
         except Exception as e:
-            st.error(f"Dosya işlenirken hata oluştu: {e}")
-
-    st.caption("Not: Bu katman, gerçek zamanlı API (Örn: Garmin/Apple Health) entegrasyonu için giriş kapısıdır.")
-
-
+            st.error(f"Model hesaplama hatası: {e}")
 
 
    
