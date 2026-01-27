@@ -362,60 +362,58 @@ elif sayfa_secimi == "🧩 Dijital İkiz Veri Mimarisi":
 
 elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
     st.title("📡 Gerçek Veri Entegrasyonu")
-    st.markdown("---")
+    
+    # Metodolojindeki katsayılar
+    GAMMA_HYPOXIC = 1.15  # SpO2 < 94 ise
+    
+    uploaded_file = st.file_uploader("Sensör verisi yükle (CSV)", type=["csv"])
 
-    st.info(
-        "Bu sayfa, dijital ikiz modelinin ileride gerçek sensör verileri "
-        "ile besleneceği entegrasyon katmanının ön gösterimidir. "
-        "Şu anda veriler simülasyon amaçlıdır."
-    )
+    if uploaded_file is not None:
+        try:
+            # OKUMA HATASINI GİDERME: sep=None ve engine='python' virgül mü noktalı virgül mü kendi anlar
+            df_sensor = pd.read_csv(uploaded_file, sep=None, engine='python')
+            df_sensor.columns = df_sensor.columns.str.lower().str.strip()
+            
+            st.success("Veri seti başarıyla yüklendi ve kolonlar doğrulandı! ✅")
 
-    st.markdown("### 📥 Simüle Edilmiş Sensör Girdileri")
+            # --- DİJİTAL İKİZ HESAPLAMA MOTORU (Formül: (PSI + FYI) * Gamma) ---
+            def hesapla_bprs(row):
+                # PSI: HRV tabanlı (45ms altı stres +15 puan)
+                psi = 20 + (15 if row['hrv'] < 45 else 0)
+                # FYI: Nabız tabanlı (80 bpm üstü yük +10 puan)
+                fyi = 10 + (10 if row['nabiz'] > 80 else 0)
+                # Gamma: Hipoksi çarpanı (SpO2 < 94 ise x1.15)
+                gamma = GAMMA_HYPOXIC if row['spo2'] < 94 else 1.0
+                
+                return (psi + fyi) * gamma
 
-    col1, col2, col3 = st.columns(3)
+            # Hesaplamayı uygula
+            df_sensor['risk_skoru'] = df_sensor.apply(hesapla_bprs, axis=1)
 
-    with col1:
-        st.metric(
-            label="🧠 HRV",
-            value="55 ms",
-            help="Kalp hızı değişkenliği – otonom sinir sistemi yükünü temsil eder."
-        )
+            # --- SONUÇLARI EKRANA BAS (DEĞİŞİKLİĞİ BURADA GÖRECEKSİN) ---
+            st.markdown("### 📊 Dijital İkiz Analiz Sonuçları")
+            
+            m1, m2, m3 = st.columns(3)
+            with m1:
+                st.metric("Yüklenen Veri Satırı", len(df_sensor))
+            with m2:
+                st.metric("Ortalama Risk Skoru", f"%{df_sensor['risk_skoru'].mean():.1f}")
+            with m3:
+                # En son satırdaki anlık durumu gösterir
+                son_risk = df_sensor['risk_skoru'].iloc[-1]
+                st.metric("Son Kayıt Risk Durumu", f"%{son_risk:.1f}", 
+                          delta="KRİTİK" if son_risk > 40 else "STABİL", delta_color="inverse")
 
-    with col2:
-        st.metric(
-            label="🫁 SpO₂",
-            value="%98",
-            help="Kandaki oksijen doygunluğu."
-        )
+            # Görselleştirme
+            st.write("**Bütünleşik Risk Skoru (BPRS) Zaman Serisi**")
+            st.area_chart(df_sensor['risk_skoru'])
+            
+            # Detaylı Tablo
+            with st.expander("Hesaplanmış Veri Tablosunu Gör"):
+                st.dataframe(df_sensor)
 
-    with col3:
-        st.metric(
-            label="💓 Nabız",
-            value="72 bpm",
-            help="Dinlenme kalp atım hızı."
-        )
-
-    st.markdown("---")
-    st.caption(
-        "Not: Bu mimari, ilerleyen aşamalarda giyilebilir sensörler veya "
-        "harici veri akışları (API / CSV / IoT) ile kalibre edilebilir "
-        "şekilde tasarlanmıştır."
-    )
-# --- SYSTEM MEMORY (SAFE STEP 1) ---
-if "system_history" not in st.session_state:
-    st.session_state.system_history = []
-
-# --- DATA INPUT GATEWAY (SAFE STEP 2) ---
-st.markdown("### 📥 Harici Veri Girişi (Opsiyonel)")
-
-uploaded_file = st.file_uploader(
-    "Sensör verisi yükle (CSV)", 
-    type=["csv"]
-)
-# --- READ SENSOR DATA (SAFE STEP 3) ---
-if uploaded_file is not None:
-    df_sensor = pd.read_csv(uploaded_file)
-    st.write("Yüklenen veri önizlemesi:", df_sensor.head())
+        except Exception as e:
+            st.error(f"Hata: Veri formatı uyumsuz. Lütfen CSV kolonlarını kontrol et (hrv, spo2, nabiz). Detay: {e}")
 
 
 
