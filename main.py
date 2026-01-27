@@ -60,7 +60,6 @@ sayfa_secimi = st.sidebar.selectbox(
     ]
 )
 
-
 st.sidebar.markdown("---")
 st.sidebar.subheader("📥 Canlı Parametreler")
 
