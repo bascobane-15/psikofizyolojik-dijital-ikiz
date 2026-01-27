@@ -203,57 +203,35 @@ if sayfa_secimi == "🏠 Ana Kontrol Paneli":
 elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
     st.title("📡 Gerçek Veri Entegrasyonu")
     
-    # Metodolojindeki katsayılar
-    GAMMA_HYPOXIC = 1.15  # SpO2 < 94 ise
-    
+    # 1. ÖNCE DEĞİŞKENİ TANIMLA (Hatanın çözümü burası)
     uploaded_file = st.file_uploader("Sensör verisi yükle (CSV)", type=["csv"])
 
+    # 2. SONRA KONTROL ET
     if uploaded_file is not None:
         try:
-            # OKUMA HATASINI GİDERME: sep=None ve engine='python' virgül mü noktalı virgül mü kendi anlar
+            # Otomatik ayırıcı tanıma
             df_sensor = pd.read_csv(uploaded_file, sep=None, engine='python')
-            df_sensor.columns = df_sensor.columns.str.lower().str.strip()
+            df_sensor.columns = [c.strip().lower() for c in df_sensor.columns]
             
-            st.success("Veri seti başarıyla yüklendi ve kolonlar doğrulandı! ✅")
-
-            # --- DİJİTAL İKİZ HESAPLAMA MOTORU (Formül: (PSI + FYI) * Gamma) ---
+            # --- DİJİTAL İKİZ HESAPLAMA ---
             def hesapla_bprs(row):
-                # PSI: HRV tabanlı (45ms altı stres +15 puan)
-                psi = 20 + (15 if row['hrv'] < 45 else 0)
-                # FYI: Nabız tabanlı (80 bpm üstü yük +10 puan)
-                fyi = 10 + (10 if row['nabiz'] > 80 else 0)
-                # Gamma: Hipoksi çarpanı (SpO2 < 94 ise x1.15)
-                gamma = GAMMA_HYPOXIC if row['spo2'] < 94 else 1.0
-                
+                # Formül: (PSI + FYI) * Gamma
+                psi = 20 + (15 if float(row['hrv']) < 45 else 0)
+                fyi = 10 + (10 if float(row['nabiz']) > 80 else 0)
+                gamma = 1.15 if float(row['spo2']) < 94 else 1.0
                 return (psi + fyi) * gamma
 
-            # Hesaplamayı uygula
             df_sensor['risk_skoru'] = df_sensor.apply(hesapla_bprs, axis=1)
 
-            # --- SONUÇLARI EKRANA BAS (DEĞİŞİKLİĞİ BURADA GÖRECEKSİN) ---
-            st.markdown("### 📊 Dijital İkiz Analiz Sonuçları")
-            
-            m1, m2, m3 = st.columns(3)
-            with m1:
-                st.metric("Yüklenen Veri Satırı", len(df_sensor))
-            with m2:
-                st.metric("Ortalama Risk Skoru", f"%{df_sensor['risk_skoru'].mean():.1f}")
-            with m3:
-                # En son satırdaki anlık durumu gösterir
-                son_risk = df_sensor['risk_skoru'].iloc[-1]
-                st.metric("Son Kayıt Risk Durumu", f"%{son_risk:.1f}", 
-                          delta="KRİTİK" if son_risk > 40 else "STABİL", delta_color="inverse")
-
-            # Görselleştirme
-            st.write("**Bütünleşik Risk Skoru (BPRS) Zaman Serisi**")
+            st.success("✅ Veriler Analiz Edildi!")
             st.area_chart(df_sensor['risk_skoru'])
-            
-            # Detaylı Tablo
-            with st.expander("Hesaplanmış Veri Tablosunu Gör"):
-                st.dataframe(df_sensor)
+            st.dataframe(df_sensor)
 
         except Exception as e:
-            st.error(f"Hata: Veri formatı uyumsuz. Lütfen CSV kolonlarını kontrol et (hrv, spo2, nabiz). Detay: {e}")
+            st.error(f"Veri işleme hatası: {e}")
+    else:
+        # Dosya yüklenmediyse gösterilecek varsayılan mesaj
+        st.info("Lütfen analiz için bir CSV dosyası sürükleyip bırakın.")
 
 
    
