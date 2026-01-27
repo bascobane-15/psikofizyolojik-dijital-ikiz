@@ -284,165 +284,60 @@ elif sayfa_secimi == "🚨 Acil Durum Rehberi":
         ve dinamik bütünleşik risk hesaplamaları (BPRS) temel alınarak üretilmektedir.
 
         **Not:** Bu yapı klinik tanı değil, erken risk farkındalığı amaçlıdır.
-        """)
-elif sayfa_secimi == "🧩 Dijital İkiz Veri Mimarisi":
-    st.title("🧩 Dijital İkiz – Veri Mimarisi")
-    st.caption("Simülasyon tabanlı modelden, veriyle kalibre edilebilir dijital ikiz mimarisine geçiş")
-    st.markdown("---")
-
-    # === ÜST: AKIŞIN SÖZEL TEMSİLİ ===
-    st.subheader("📥 Girdi Katmanı (Input Layer)")
-    st.markdown("""
-    - İzolasyon Süresi **I(t)**
-    - Görev Yoğunluğu **G(t)**
-    - Uyku Süresi **U(t)**
-    - Sosyal Etkileşim **S(t)**
-    - Giyilebilir Sensörler *(opsiyonel)*: **HRV**, **SpO₂**
-    """)
-
-    st.markdown("⬇️")
-
-    st.subheader("⚙️ Ön İşleme ve Normalizasyon")
-    st.markdown("""
-    - Tüm değişkenler **0–1 aralığında normalize edilir**
-    - Zaman adımlarına bölünür *(t → t+1)*
-    - Gürültü ve eksik veri kavramsal olarak ele alınır
-    """)
-
-    st.markdown("⬇️")
-
-    # === ÇEKİRDEK MODEL ===
-    st.subheader("🧠 Dijital İkiz Model Çekirdeği")
-    st.latex(r"""
-    R(t)= w_1 I(t) + w_2 G(t) - w_3 U(t) - w_4 S(t) + w_5 I(t)\cdot G(t)
-    """)
-    st.latex(r"""
-    P(t)=P(t-1)+\alpha \cdot R(t)
-    """)
-
-    st.markdown("""
-    - Risk **anlık değil**, zamanla **birikimli** hesaplanır  
-    - İzolasyon süresine bağlı **gecikmeli kırılma davranışı** modellenir  
-    """)
-
-    st.markdown("⬇️")
-
-    # === İNDEKSLER ===
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.subheader("🧠 Psikolojik Stres İndeksi (PSI)")
-        st.markdown("""
-        - Algılanan stres  
-        - Bilişsel yorgunluk  
-        - Duygudurum dalgalanması  
-        """)
-
-    with col2:
-        st.subheader("💓 Fizyolojik Yüklenme İndeksi (FYI)")
-        st.markdown("""
-        - Uyku bozulması  
-        - Sirkadiyen ritim  
-        - **HRV & SpO₂ → şiddetlendirici katsayı (β)**  
-        """)
-
-    st.markdown("⬇️")
-
-    # === BÜTÜNLEŞİK SKOR ===
-    st.subheader("📊 Bütünleşik Psikofizyolojik Risk Skoru (BPRS)")
-    st.latex(r"""
-    BPRS(t) = (PSI + FYI) \times \gamma(t)
-    """)
-
-    st.markdown("""
-    - İzolasyon süresiyle etkileşimlidir  
-    - **60. gün sonrası doğrusal olmayan risk artışı** temsil edilir  
-    """)
-
-    st.markdown("⬇️")
-
-    # === ERKEN UYARI ===
-    st.subheader("🚨 Erken Risk Uyarı Mekanizması")
-    st.latex(r"""
-    \text{If } \frac{d(BPRS)}{dt} > \theta \Rightarrow \text{ALERT}
-    """)
-
-    st.markdown("""
-    - Mutlak skor yerine **değişim hızı** izlenir  
-    - Kritik eşik aşıldığında sistem uyarı üretir  
-    """)
-
-    st.markdown("---")
-
-    # === KALİBRASYON VURGUSU (ÇOK KRİTİK) ===
-    st.success(
-        "🔁 Bu dijital ikiz mimarisi, giyilebilir sensörlerden elde edilecek "
-        "gerçek dünya verileri ile **kalibre edilebilir şekilde tasarlanmıştır**. "
-        "Mevcut çalışma, klinik doğrulama içermeyen simülasyon tabanlı bir altyapı sunmaktadır."
-    )elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
+        """)elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
     st.title("📡 Gerçek Veri Entegrasyonu")
     
-    # --- FORMÜL PARAMETRELERİ (Metodolojine Sadık Kalarak) ---
-    # Sabit çarpanlar ve eşikler
-    GAMMA_HYPOXIC = 1.15  # SpO2 < 94 için şiddetlendirme katsayısı
-    STRESS_BONUS = 15     # Düşük HRV için stres puanı
-    PHYSICAL_BONUS = 10   # Yüksek Nabız için yüklenme puanı
-
+    # Metodolojindeki katsayılar
+    GAMMA_HYPOXIC = 1.15  # SpO2 < 94 ise
+    
     uploaded_file = st.file_uploader("Sensör verisi yükle (CSV)", type=["csv"])
 
     if uploaded_file is not None:
         try:
-            df_sensor = pd.read_csv(uploaded_file, sep=";")
-            df_sensor.columns = df_sensor.columns.str.lower()
+            # OKUMA HATASINI GİDERME: sep=None ve engine='python' virgül mü noktalı virgül mü kendi anlar
+            df_sensor = pd.read_csv(uploaded_file, sep=None, engine='python')
+            df_sensor.columns = df_sensor.columns.str.lower().str.strip()
             
-            # --- DİJİTAL İKİZ HESAPLAMA MOTORU ---
+            st.success("Veri seti başarıyla yüklendi ve kolonlar doğrulandı! ✅")
+
+            # --- DİJİTAL İKİZ HESAPLAMA MOTORU (Formül: (PSI + FYI) * Gamma) ---
             def hesapla_bprs(row):
-                # 1. Psikolojik Stres İndeksi (PSI) Tahmini (HRV tabanlı)
-                # HRV 45ms altındaysa stres +15 artar (Varsayılan baz: 20)
-                psi = 20 + (STRESS_BONUS if row['hrv'] < 45 else 0)
-                
-                # 2. Fizyolojik Yüklenme İndeksi (FYI) (Nabız tabanlı)
-                # Nabız 80 bpm üzerindeyse yüklenme +10 artar
-                fyi = 10 + (PHYSICAL_BONUS if row['nabiz'] > 80 else 0)
-                
-                # 3. Şiddetlendirme Katsayısı (Gamma - Hipoksi Durumu)
+                # PSI: HRV tabanlı (45ms altı stres +15 puan)
+                psi = 20 + (15 if row['hrv'] < 45 else 0)
+                # FYI: Nabız tabanlı (80 bpm üstü yük +10 puan)
+                fyi = 10 + (10 if row['nabiz'] > 80 else 0)
+                # Gamma: Hipoksi çarpanı (SpO2 < 94 ise x1.15)
                 gamma = GAMMA_HYPOXIC if row['spo2'] < 94 else 1.0
                 
-                # Formül: BPRS = (PSI + FYI) * Gamma
                 return (psi + fyi) * gamma
 
-            # Hesaplamayı tüm satırlara uygula
+            # Hesaplamayı uygula
             df_sensor['risk_skoru'] = df_sensor.apply(hesapla_bprs, axis=1)
+
+            # --- SONUÇLARI EKRANA BAS (DEĞİŞİKLİĞİ BURADA GÖRECEKSİN) ---
+            st.markdown("### 📊 Dijital İkiz Analiz Sonuçları")
             
-            st.success("Dijital İkiz Çekirdeği: Veriler analiz edildi ve risk skorları hesaplandı. ✅")
+            m1, m2, m3 = st.columns(3)
+            with m1:
+                st.metric("Yüklenen Veri Satırı", len(df_sensor))
+            with m2:
+                st.metric("Ortalama Risk Skoru", f"%{df_sensor['risk_skoru'].mean():.1f}")
+            with m3:
+                # En son satırdaki anlık durumu gösterir
+                son_risk = df_sensor['risk_skoru'].iloc[-1]
+                st.metric("Son Kayıt Risk Durumu", f"%{son_risk:.1f}", 
+                          delta="KRİTİK" if son_risk > 40 else "STABİL", delta_color="inverse")
 
-            # --- GÖRSEL ANALİZ ---
-            col_metrics, col_chart = st.columns([1, 2])
-
-            with col_metrics:
-                ortalama_risk = df_sensor['risk_skoru'].mean()
-                max_risk = df_sensor['risk_skoru'].max()
-                
-                st.metric("Ortalama Görev Riski", f"%{ortalama_risk:.1f}")
-                st.metric("Pik Risk Seviyesi", f"%{max_risk:.1f}", 
-                          delta="KRİTİK" if max_risk > 50 else "STABİL",
-                          delta_color="inverse")
-
-            with col_chart:
-                st.write("**Zamana Bağlı Bütünleşik Risk Projeksiyonu**")
-                st.area_chart(df_sensor['risk_skoru'])
-
-            # --- ÖZEL DURUM ANALİZİ ---
-            st.markdown("### 🔍 Anomali Detayları")
-            kritik_segment = df_sensor[df_sensor['risk_skoru'] > 40]
-            if not kritik_segment.empty:
-                st.warning(f"Sistem, simülasyon boyunca {len(kritik_segment)} adet yüksek riskli an tespit etti.")
-                st.dataframe(kritik_segment)
-            else:
-                st.info("Analiz sonucunda yüksek riskli bir anomaliye rastlanmadı.")
+            # Görselleştirme
+            st.write("**Bütünleşik Risk Skoru (BPRS) Zaman Serisi**")
+            st.area_chart(df_sensor['risk_skoru'])
+            
+            # Detaylı Tablo
+            with st.expander("Hesaplanmış Veri Tablosunu Gör"):
+                st.dataframe(df_sensor)
 
         except Exception as e:
-            st.error(f"Model hesaplama hatası: {e}")
+            st.error(f"Hata: Veri formatı uyumsuz. Lütfen CSV kolonlarını kontrol et (hrv, spo2, nabiz). Detay: {e}")
 
 
    
