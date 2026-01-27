@@ -415,7 +415,16 @@ elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
         except Exception as e:
             st.error(f"Hata: Veri formatı uyumsuz. Lütfen CSV kolonlarını kontrol et (hrv, spo2, nabiz). Detay: {e}")
 
-
+# --- AKILLI ACİL DURUM TETİKLEYİCİ ---
+            st.markdown("---")
+            max_risk_degeri = df_sensor['risk_skoru'].max()
+            
+            if max_risk_degeri > 50:
+                st.error(f"⚠️ KRİTİK ALARM: Simülasyon sırasında risk skoru %{max_risk_degeri:.1f} seviyesine ulaştı!")
+                st.info("Lütfen 'Acil Durum Rehberi' sayfasındaki **Psikolojik Müdahale (%70+ Risk)** protokolünü inceleyin.")
+            elif max_risk_degeri > 40:
+                st.warning(f"🔔 DİKKAT: Orta düzey risk artışı tespit edildi (%{max_risk_degeri:.1f}).")
+                st.write("Öneri: Personelin dinlenme sürelerini artırın.")
 
    
 
