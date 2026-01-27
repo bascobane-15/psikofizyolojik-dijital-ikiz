@@ -199,60 +199,61 @@ if sayfa_secimi == "🏠 Ana Kontrol Paneli":
         st.write(f"**İzolasyon Günü:** {izolasyon}")
         st.write(f"**Işık Durumu:** {isik_maruziyeti}")
         st.write(f"**Uyku Düzeni:** {uyku} Saat")
+
 elif sayfa_secimi == "📡 Gerçek Veri Entegrasyonu":
     st.title("📡 Gerçek Veri Entegrasyonu")
     
-    # Metodolojindeki Tablo 6 ve 7 Katsayıları
-    GAMMA_HYPOXIC = 1.15  # SpO2 < 94 için şiddetlendirme
+    # Metodolojindeki katsayılar
+    GAMMA_HYPOXIC = 1.15  # SpO2 < 94 ise
     
     uploaded_file = st.file_uploader("Sensör verisi yükle (CSV)", type=["csv"])
 
     if uploaded_file is not None:
         try:
-            # ÖNEMLİ: sep=None ve engine='python' sayesinde CSV'deki ; veya , ayrımını otomatik çözer
+            # OKUMA HATASINI GİDERME: sep=None ve engine='python' virgül mü noktalı virgül mü kendi anlar
             df_sensor = pd.read_csv(uploaded_file, sep=None, engine='python')
+            df_sensor.columns = df_sensor.columns.str.lower().str.strip()
             
-            # Sütun isimlerini temizle (boşlukları sil ve küçük harf yap)
-            df_sensor.columns = [c.strip().lower() for c in df_sensor.columns]
-            
-            # --- DİJİTAL İKİZ HESAPLAMA MOTORU ---
+            st.success("Veri seti başarıyla yüklendi ve kolonlar doğrulandı! ✅")
+
+            # --- DİJİTAL İKİZ HESAPLAMA MOTORU (Formül: (PSI + FYI) * Gamma) ---
             def hesapla_bprs(row):
-                # PSI: HRV < 45 ise +15 puan stres yükü
-                psi = 20 + (15 if float(row['hrv']) < 45 else 0)
-                # FYI: Nabız > 80 ise +10 puan fiziksel yük
-                fyi = 10 + (10 if float(row['nabiz']) > 80 else 0)
-                # Gamma: SpO2 < 94 ise %15 artış
-                gamma = GAMMA_HYPOXIC if float(row['spo2']) < 94 else 1.0
+                # PSI: HRV tabanlı (45ms altı stres +15 puan)
+                psi = 20 + (15 if row['hrv'] < 45 else 0)
+                # FYI: Nabız tabanlı (80 bpm üstü yük +10 puan)
+                fyi = 10 + (10 if row['nabiz'] > 80 else 0)
+                # Gamma: Hipoksi çarpanı (SpO2 < 94 ise x1.15)
+                gamma = GAMMA_HYPOXIC if row['spo2'] < 94 else 1.0
                 
                 return (psi + fyi) * gamma
 
-            # Hesaplamayı yap ve yeni sütun ekle
+            # Hesaplamayı uygula
             df_sensor['risk_skoru'] = df_sensor.apply(hesapla_bprs, axis=1)
 
-            # --- EKRANDA DEĞİŞİKLİĞİ GÖSTERECEK ALAN ---
-            st.success("✅ Veriler Başarıyla Ayrıştırıldı ve BPRS Hesaplandı!")
+            # --- SONUÇLARI EKRANA BAS (DEĞİŞİKLİĞİ BURADA GÖRECEKSİN) ---
+            st.markdown("### 📊 Dijital İkiz Analiz Sonuçları")
             
-            # Üst tarafa özet metrikler ekleyelim (Bu kısım görseli değiştirir)
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Analiz Edilen Kayıt", len(df_sensor))
-            with col2:
-                st.metric("Ortalama Risk", f"%{df_sensor['risk_skoru'].mean():.1f}")
-            with col3:
-                anlik_risk = df_sensor['risk_skoru'].iloc[-1]
-                st.metric("Anlık Risk Durumu", f"%{anlik_risk:.1f}")
+            m1, m2, m3 = st.columns(3)
+            with m1:
+                st.metric("Yüklenen Veri Satırı", len(df_sensor))
+            with m2:
+                st.metric("Ortalama Risk Skoru", f"%{df_sensor['risk_skoru'].mean():.1f}")
+            with m3:
+                # En son satırdaki anlık durumu gösterir
+                son_risk = df_sensor['risk_skoru'].iloc[-1]
+                st.metric("Son Kayıt Risk Durumu", f"%{son_risk:.1f}", 
+                          delta="KRİTİK" if son_risk > 40 else "STABİL", delta_color="inverse")
 
-            # Risk Grafiği (Bu en büyük görsel değişikliktir)
-            st.subheader("📈 Bütünleşik Risk Projeksiyonu (BPRS)")
+            # Görselleştirme
+            st.write("**Bütünleşik Risk Skoru (BPRS) Zaman Serisi**")
             st.area_chart(df_sensor['risk_skoru'])
-
-            # Tabloyu göster
-            with st.expander("Hesaplanan Ham Verileri İncele"):
+            
+            # Detaylı Tablo
+            with st.expander("Hesaplanmış Veri Tablosunu Gör"):
                 st.dataframe(df_sensor)
 
         except Exception as e:
-            st.error(f"⚠️ Dosya İşleme Hatası: {e}")
-            st.info("Lütfen CSV dosyasının 'hrv', 'spo2' ve 'nabiz' başlıklarını içerdiğinden emin olun.")
+            st.error(f"Hata: Veri formatı uyumsuz. Lütfen CSV kolonlarını kontrol et (hrv, spo2, nabiz). Detay: {e}")
 
 
    
