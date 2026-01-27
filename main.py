@@ -415,7 +415,13 @@ uploaded_file = st.file_uploader(
 # --- READ SENSOR DATA (SAFE STEP 3) ---
 if uploaded_file is not None:
     df_sensor = pd.read_csv(uploaded_file)
-    st.write("Yüklenen veri önizlemesi:", df_sensor.head())
+    
+    # Sütun adlarını modele uyumlu hale getir
+    df_sensor.columns = df_sensor.columns.str.lower()
+    
+    st.success("CSV başarıyla yüklendi ✅")
+    st.dataframe(df_sensor)
+)
 
 
 
